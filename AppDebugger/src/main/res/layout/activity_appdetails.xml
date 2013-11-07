@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="vertical"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/labelAppName"
+				android:text="@string/labelAppName"
+				/>
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/textViewAppName"
+				android:text="@string/textViewAppName"
+				/>
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:id="@+id/labelAppVersion"
+		android:text="@string/labelAppVersion"
+		/>
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:id="@+id/textViewAppVersion"
+		android:text="@string/textViewAppVersion"/>
+
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/appDebuggerMonitor"
+		android:id="@+id/checkboxAppDebug"
+		android:clickable="true"
+		android:onClick="monitorApp"/>
+
+	<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/buttonAppLaunch"
+				android:text="@string/buttonLaunchApp"
+				android:onClick="launchApp"/>
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/buttonDebugApp"
+				android:text="@string/buttonDebugApp"
+				android:onClick="debugApp"/>
+</LinearLayout>
