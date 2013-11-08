@@ -5,17 +5,16 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.Toast;
+
 import com.cs253.appdebugger.database.MonitorDataSource;
 import com.cs253.appdebugger.database.StatsDataSource;
-import com.cs253.appdebugger.logcat.EventParser;
+import com.cs253.appdebugger.debugging.Debugger;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ArrayList;
+
 import android.content.Context;
 
 /**
@@ -25,7 +24,7 @@ public class AppDebuggerService extends Service {
 
     private StatsDataSource statsDataSource;
     private MonitorDataSource monitorDataSource;
-    private EventParser eventParser;
+    private Debugger eventParser;
     private ArrayList<App> apps;
     private Application parentApp;
     private Context context;
@@ -42,7 +41,7 @@ public class AppDebuggerService extends Service {
 
         //TODO get the list of apps that are monitored
         //this.apps = this.monitorDataSource.getAllActiveApps();
-        this.eventParser = new EventParser(this.apps);
+        //this.eventParser = new Debugger(this.apps);
 
 
         //TODO this will control our logic
@@ -64,23 +63,7 @@ public class AppDebuggerService extends Service {
             //Toast.makeText(getApplicationContext(), "We are in the doinbackground", Toast.LENGTH_SHORT).show();
             try
             {
-                Process mLogcatProc = null;
-                BufferedReader reader = null;
-                mLogcatProc = Runtime.getRuntime().exec(new String[]{"logcat", "-d"});
 
-                reader = new BufferedReader(new InputStreamReader(mLogcatProc.getInputStream()));
-
-                String line;
-                final StringBuilder log = new StringBuilder();
-                String separator = System.getProperty("line.separator");
-
-                while ((line = reader.readLine()) != null)
-                {
-                    log.append(line);
-                    log.append(separator);
-                }
-                String w = log.toString();
-                //Toast.makeText(getApplicationContext(),w, Toast.LENGTH_LONG).show();
             }
             catch (Exception e)
             {
