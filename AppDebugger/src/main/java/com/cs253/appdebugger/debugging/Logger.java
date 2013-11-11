@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import com.cs253.appdebugger.App;
 
@@ -18,26 +19,59 @@ public class Logger {
     private String line;
     private final StringBuilder log;
     private String separator;
-    private List<App> apps;
+    private ArrayList<App> apps;
+    private String level;
+    private String singleApp;
 
-    public Logger(List<App> applications) {
+    /**
+     * Standard:
+     * This allows us to log for all apps,
+     * This is called from the AppDebugerService
+     */
+    public Logger(String level) {
         log = new StringBuilder();
-        this.apps = applications;
+        this.level = level;
 
-        readLogs(this.apps);
+        //readAllLogs();
     }
 
-    public String readLogs(List<App> applications) {
-        String logger = "";
+    /**
+     * Overriden:
+     * This allows us to log for a specific app, not all of them
+     * Only call this from the AppDetails activity
+     * @param appName
+     */
+    public Logger(String appName, String level) {
+        log = new StringBuilder();
+        this.singleApp = appName;
+        this.level = level;
+
+        readALog();
+    }
+
+    public String readALog() {
+        return parseLogs(this.singleApp);
+    }
+
+    public String readAllLogs() {
+        String s = "";
+        for(App a: this.apps) {
+            s = s + (a.getPackageName());
+        }
+        return parseLogs(s);
+    }
+
+    public String parseLogs(String filter) {
         try {
-            for(App a : applications) {
-                Log.d("Something", a.getPackageName());
-            }
-            this.mLogcatProc = Runtime.getRuntime().exec("logcat -d");
+            this.mLogcatProc = Runtime.getRuntime().exec("logcat " + filter + ":" + this.level + " *:s");
             this.reader = new BufferedReader(new InputStreamReader(this.mLogcatProc.getInputStream()));
         } catch (IOException e) {
             return null;
         }
         return this.log.toString();
+    }
+
+    public void addApp(App a) {
+        this.apps.add(a);
     }
 }

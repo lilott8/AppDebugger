@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import com.cs253.appdebugger.App;
+import com.cs253.appdebugger.debugging.Traffic.TrafficMonitorActivity;
+
 import android.util.Log;
 
 
@@ -14,7 +16,7 @@ import android.util.Log;
 public class Debugger {
 
     private ArrayList<App> apps;
-
+    Logger logger;
 
     public Debugger() {
 
