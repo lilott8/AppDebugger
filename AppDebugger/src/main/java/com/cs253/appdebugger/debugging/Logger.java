@@ -1,8 +1,12 @@
 package com.cs253.appdebugger.debugging;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
+import com.cs253.appdebugger.App;
 
 /**
  * Created by jason on 11/7/13.
@@ -14,31 +18,26 @@ public class Logger {
     private String line;
     private final StringBuilder log;
     private String separator;
+    private List<App> apps;
 
-    public Logger() {
-/*
-        this.mLogcatProc = null;
-        this.reader = null;
-        try {
-        this.mLogcatProc = Runtime.getRuntime().exec(new String[]{"logcat", "-d"});
-        } catch (IOException e) {
+    public Logger(List<App> applications) {
+        log = new StringBuilder();
+        this.apps = applications;
 
-        }
-        this.reader = new BufferedReader(new InputStreamReader(this.mLogcatProc.getInputStream()));
-
-        this.log = new StringBuilder();
-        this.separator = System.getProperty("line.separator");
+        readLogs(this.apps);
     }
 
-    public String readLine() throws IOException {
-
-        while ((this.line = this.reader.readLine()) != null)
-        {
-            log.append(line);
-            log.append(separator);
+    public String readLogs(List<App> applications) {
+        String logger = "";
+        try {
+            for(App a : applications) {
+                Log.d("Something", a.getPackageName());
+            }
+            this.mLogcatProc = Runtime.getRuntime().exec("logcat -d");
+            this.reader = new BufferedReader(new InputStreamReader(this.mLogcatProc.getInputStream()));
+        } catch (IOException e) {
+            return null;
         }
-        return log.toString();
-        //Toast.makeText(getApplicationContext(),w, Toast.LENGTH_LONG).show();
-        */
+        return this.log.toString();
     }
 }
