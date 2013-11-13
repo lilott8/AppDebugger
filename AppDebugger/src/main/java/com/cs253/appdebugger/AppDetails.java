@@ -151,10 +151,13 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void debugApp(View v) {
         // Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
+        // Toast.makeText(this.appContext, "Hey, working?" + Long.toString(data), Toast.LENGTH_SHORT).show();
         long data = this.debugger.trafficMonitor.getTxBytes();
-        Toast.makeText(this.appContext, "Hey, working?" + Long.toString(data), Toast.LENGTH_SHORT).show();
+        long manual = this.debugger.trafficMonitor.getTotalBytesManual();
+        Log.d("AppDebugger", "Traffic status through trafficstats: " + Long.toString(data));
+        Log.d("AppDebugger", "Traffic status through manual:" + Long.toString(manual));
     }
-    
+
     /**
      * Launch our App with no debugging...
      */
