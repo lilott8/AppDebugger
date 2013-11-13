@@ -26,13 +26,5 @@ public class Debugger {
         this.trafficMonitor = new TrafficMonitor(this.app);
     }
 
-    public long getTxBytes() {
-        return this.trafficMonitor.getTxBytes();
-    }
-
-    public long totalBytes() {
-        return 0;
-    }
-
 
 }

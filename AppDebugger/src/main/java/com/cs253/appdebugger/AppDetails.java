@@ -80,11 +80,15 @@ public class AppDetails extends Activity implements OnClickListener {
         this.tvAppUid = (TextView) findViewById(R.id.textViewAppUid);
         this.tvAppVersion = (TextView) findViewById(R.id.textViewAppVersion);
         this.cbMonitorApp = (CheckBox) findViewById(R.id.checkboxAppDebug);
+        // Initiate the onclicklistener for our checkbox
         this.cbMonitorApp.setOnClickListener(this);
         // Set our check box based on the active flag
         this.cbMonitorApp.setChecked(this.active);
 
-        this.tvAppVersion.setText(String.valueOf(this.app.getUid()));
+        // Log.d("AppDebugger", "Uid is: " + Integer.toString(this.app.getUid()));
+
+        // Add to those views what we need
+        this.tvAppVersion.setText(Integer.toString(this.app.getUid()));
         this.tvAppName.setText(this.app.getLabel());
         this.tvAppVersion.setText(Integer.toString(this.app.getVersionCode()));
         this.cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
@@ -109,6 +113,7 @@ public class AppDetails extends Activity implements OnClickListener {
                 this.app.setPackageName(pi.packageName);
                 this.app.setVersionName(pi.versionName);
                 this.app.setVersionCode(pi.versionCode);
+                Toast.makeText(this.appContext, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
                 this.app.setUid(ai.uid);
                 //this.app.setTitle(a.applicationInfo.)
 
@@ -145,11 +150,11 @@ public class AppDetails extends Activity implements OnClickListener {
      * Launch our app with debugging...
      */
     public void debugApp(View v) {
-        Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long data = this.debugger.getTxBytes();
-        Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
+        long data = this.debugger.trafficMonitor.getTxBytes();
+        Toast.makeText(this.appContext, "Hey, working?" + Long.toString(data), Toast.LENGTH_SHORT).show();
     }
-
+    
     /**
      * Launch our App with no debugging...
      */
@@ -165,7 +170,7 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void monitorApp(View v) {
         Toast.makeText(getApplicationContext(), "Debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long data = this.debugger.getTxBytes();
+        long data = this.debugger.trafficMonitor.getTxBytes();
         Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
 
         //TODO: parse logcat for specific app

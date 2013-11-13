@@ -1,6 +1,7 @@
 package com.cs253.appdebugger.debugging;
 
 import android.net.TrafficStats;
+import android.util.Log;
 
 import com.cs253.appdebugger.App;
 
@@ -20,6 +21,8 @@ public class TrafficMonitor{
     }
 
     public long getTxBytes() {
+
+        Log.d("AppDebugger", "The UID for " + this.app.getPackageName() + " is " + Integer.toString(this.app.getUid()));
         return this.trafficStats.getUidTxBytes(this.app.getUid());
     }
 }

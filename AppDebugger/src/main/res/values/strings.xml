@@ -16,7 +16,7 @@
 	<string name="buttonDebugApp">Debug Application</string>
 	<string name="appDebuggerService">Hello World!</string>
 	<string name="appDebuggerMonitor"></string>
-    <string name="labelAppUID">AppUId:</string>
+    <string name="labelAppUID">AppUID:</string>
     <string name="textVivewAppUID"></string>
 
 </resources>

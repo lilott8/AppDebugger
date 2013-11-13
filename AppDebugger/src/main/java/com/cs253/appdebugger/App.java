@@ -1,6 +1,10 @@
 package com.cs253.appdebugger;
 
 
+import android.util.Log;
+import android.widget.Toast;
+import android.content.Context;
+
 /**
  * This class represents a simple bean that will hold the values for an installed app such as name, version
  * and package name (which is needed to start the application).
