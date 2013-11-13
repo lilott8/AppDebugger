@@ -28,6 +28,18 @@
 		android:id="@+id/textViewAppVersion"
 		android:text="@string/textViewAppVersion"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/labelAppUID"
+        android:text="@string/labelAppUID"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewAppUid"
+        android:text=""/>
+
 	<CheckBox
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

@@ -168,6 +168,7 @@ public class ListApps extends Activity implements OnItemClickListener {
             app.setVersionCode(p.versionCode);
             CharSequence description = p.applicationInfo.loadDescription(packageManager);
             app.setDescription(description != null ? description.toString() : "");
+            app.setUid(a.uid);
             apps.add(app);
         }
         return apps;

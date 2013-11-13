@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Debug;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -22,6 +23,8 @@ import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
+import com.cs253.appdebugger.debugging.Debugger;
+
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
 
@@ -40,10 +43,12 @@ public class AppDetails extends Activity implements OnClickListener {
     boolean active;
     TextView tvAppName;
     TextView tvAppVersion;
+    TextView tvAppUid;
     Context appContext;
     CheckBox cbMonitorApp;
     Bundle extras;
     MonitorDataSource mds;
+    Debugger debugger;
 
 
     protected void onCreate(Bundle savedInstance) {
@@ -64,19 +69,25 @@ public class AppDetails extends Activity implements OnClickListener {
         this.monitor = this.mds.selectMonitorByAppName(this.app.getPackageName());
         this.active = this.monitor.getActive();
         this.appName = this.monitor.getAppName();
+        // This has to instantiate after our app has been declared
+        this.debugger = new Debugger(this.app);
 
+        // Draw our app details activity
         setContentView(R.layout.activity_appdetails);
 
-        tvAppName = (TextView) findViewById(R.id.textViewAppName);
-        tvAppVersion = (TextView) findViewById(R.id.textViewAppVersion);
-        cbMonitorApp = (CheckBox) findViewById(R.id.checkboxAppDebug);
-        cbMonitorApp.setOnClickListener(this);
+        // Set some of our activity's views
+        this.tvAppName = (TextView) findViewById(R.id.textViewAppName);
+        this.tvAppUid = (TextView) findViewById(R.id.textViewAppUid);
+        this.tvAppVersion = (TextView) findViewById(R.id.textViewAppVersion);
+        this.cbMonitorApp = (CheckBox) findViewById(R.id.checkboxAppDebug);
+        this.cbMonitorApp.setOnClickListener(this);
         // Set our check box based on the active flag
-        cbMonitorApp.setChecked(this.active);
+        this.cbMonitorApp.setChecked(this.active);
 
-        tvAppName.setText(this.app.getLabel());
-        tvAppVersion.setText(Integer.toString(this.app.getVersionCode()));
-        cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
+        this.tvAppVersion.setText(String.valueOf(this.app.getUid()));
+        this.tvAppName.setText(this.app.getLabel());
+        this.tvAppVersion.setText(Integer.toString(this.app.getVersionCode()));
+        this.cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
         //Toast.makeText(this.appContext, this.getAppName(), Toast.LENGTH_LONG).show();
         checkForOtherActivities();
     }
@@ -98,6 +109,7 @@ public class AppDetails extends Activity implements OnClickListener {
                 this.app.setPackageName(pi.packageName);
                 this.app.setVersionName(pi.versionName);
                 this.app.setVersionCode(pi.versionCode);
+                this.app.setUid(ai.uid);
                 //this.app.setTitle(a.applicationInfo.)
 
                 CharSequence label = ai.loadLabel(this.packageManager);
@@ -134,6 +146,8 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void debugApp(View v) {
         Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
+        long data = this.debugger.getTxBytes();
+        Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -145,9 +159,14 @@ public class AppDetails extends Activity implements OnClickListener {
         // startActivity(intent);
     }
 
+    /**
+     * This is what requires the most work. So put cool code here!
+     * @param v
+     */
     public void monitorApp(View v) {
         Toast.makeText(getApplicationContext(), "Debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-
+        long data = this.debugger.getTxBytes();
+        Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
 
         //TODO: parse logcat for specific app
         //TODO: collect network traffic for specific app
@@ -188,5 +207,10 @@ public class AppDetails extends Activity implements OnClickListener {
 
         }
 
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        this.mds.close();
     }
 }

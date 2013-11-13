@@ -29,6 +29,7 @@ public class App {
     private int versionCode;
     private String description;
     private String label;
+    private int uid;
 
     // ordinary getters and setters
 
@@ -75,6 +76,10 @@ public class App {
     public void setLabel(String label) { this.label = label;}
 
     public String getLabel() { return this.label;}
+
+    public void setUid(int uid) {this.uid = uid;}
+
+    public int getUid() {return this.uid;}
 
 }
 
