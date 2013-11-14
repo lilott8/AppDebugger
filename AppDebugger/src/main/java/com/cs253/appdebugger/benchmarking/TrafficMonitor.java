@@ -1,4 +1,4 @@
-package com.cs253.appdebugger.debugging;
+package com.cs253.appdebugger.benchmarking;
 
 import android.net.TrafficStats;
 import android.util.Log;
@@ -32,7 +32,7 @@ public class TrafficMonitor{
         return this.trafficStats.getUidTxBytes(this.app.getUid());
     }
 
-    public Long getTotalBytesManual(){
+    public Long getTxBytesManual(){
 
         int localUid = this.app.getUid();
 

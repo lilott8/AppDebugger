@@ -1,29 +1,25 @@
 package com.cs253.appdebugger;
 
-import com.cs253.appdebugger.App;
+import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.MonitorDataSource;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.app.Activity;
-import android.os.Debug;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.app.Application;
+
 import java.util.List;
-import android.content.pm.PackageInfo;
+
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.widget.TextView;
-import android.content.Intent;
 import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
-import com.cs253.appdebugger.debugging.Debugger;
+import com.cs253.appdebugger.benchmarking.Benchmarker;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -48,7 +44,7 @@ public class AppDetails extends Activity implements OnClickListener {
     CheckBox cbMonitorApp;
     Bundle extras;
     MonitorDataSource mds;
-    Debugger debugger;
+    Benchmarker benchmarker;
 
 
     protected void onCreate(Bundle savedInstance) {
@@ -70,7 +66,7 @@ public class AppDetails extends Activity implements OnClickListener {
         this.active = this.monitor.getActive();
         this.appName = this.monitor.getAppName();
         // This has to instantiate after our app has been declared
-        this.debugger = new Debugger(this.app);
+        this.benchmarker = new Benchmarker(this.app);
 
         // Draw our app details activity
         setContentView(R.layout.activity_appdetails);
@@ -151,11 +147,11 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void debugApp(View v) {
         // Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        // Toast.makeText(this.appContext, "Hey, working?" + Long.toString(data), Toast.LENGTH_SHORT).show();
-        long data = this.debugger.trafficMonitor.getTxBytes();
-        long manual = this.debugger.trafficMonitor.getTotalBytesManual();
-        Log.d("AppDebugger", "Traffic status through trafficstats: " + Long.toString(data));
-        Log.d("AppDebugger", "Traffic status through manual:" + Long.toString(manual));
+        long txData;
+        if((txData = this.benchmarker.trafficMonitor.getTxBytes()) <= 0) {
+            txData = this.benchmarker.trafficMonitor.getTxBytesManual();
+        }
+        Log.d("AppDebugger", "Traffic transmitted at this epoch: " + Long.toString(txData));
     }
 
     /**
@@ -173,7 +169,7 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void monitorApp(View v) {
         Toast.makeText(getApplicationContext(), "Debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long data = this.debugger.trafficMonitor.getTxBytes();
+        long data = this.benchmarker.trafficMonitor.getTxBytes();
         Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
 
         //TODO: parse logcat for specific app

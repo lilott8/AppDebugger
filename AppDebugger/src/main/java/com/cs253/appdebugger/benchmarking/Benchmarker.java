@@ -1,18 +1,12 @@
-package com.cs253.appdebugger.debugging;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+package com.cs253.appdebugger.benchmarking;
 
 import com.cs253.appdebugger.App;
-import com.cs253.appdebugger.debugging.TrafficMonitor;
-import android.util.Log;
 
 
 /**
  * Created by jason on 11/6/13.
  */
-public class Debugger {
+public class Benchmarker {
 
     private App app;
     public Logger logger;
@@ -20,7 +14,7 @@ public class Debugger {
     private long startTx;
     private long endTx;
 
-    public Debugger(App whichApp) {
+    public Benchmarker(App whichApp) {
         this.app = whichApp;
         this.logger = new Logger("V");
         this.trafficMonitor = new TrafficMonitor(this.app);

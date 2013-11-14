@@ -1,4 +1,4 @@
-package com.cs253.appdebugger.debugging;
+package com.cs253.appdebugger.benchmarking;
 
 import android.util.Log;
 
@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
+
 import com.cs253.appdebugger.App;
 
 /**
@@ -63,8 +63,19 @@ public class Logger {
 
     public String parseLogs(String filter) {
         try {
+            String logCatFilter = "logcat "+filter+":"+this.level+" *:s";
+
+            Log.d("AppDebugger", logCatFilter);
+
             this.mLogcatProc = Runtime.getRuntime().exec("logcat " + filter + ":" + this.level + " *:s");
             this.reader = new BufferedReader(new InputStreamReader(this.mLogcatProc.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+
+                // Look for a start up command...
+                Log.d("AppDebugger", "Here is a log for " + this.singleApp + ": " + line);
+            }
+
         } catch (IOException e) {
             return null;
         }
