@@ -8,16 +8,16 @@ import com.cs253.appdebugger.App;
  */
 public class Benchmarker {
 
-    private App app;
+    private String packageName;
     public Logger logger;
     public TrafficMonitor trafficMonitor;
     private long startTx;
     private long endTx;
 
-    public Benchmarker(App whichApp) {
-        this.app = whichApp;
+    public Benchmarker(String packageName) {
+        this.packageName = packageName;
         this.logger = new Logger("V");
-        this.trafficMonitor = new TrafficMonitor(this.app);
+        this.trafficMonitor = new TrafficMonitor(this.packageName);
     }
 
 

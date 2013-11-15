@@ -2,13 +2,18 @@ package com.cs253.appdebugger;
 
 import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.MonitorDataSource;
+
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.List;
 
 import android.content.pm.PackageManager;
@@ -19,15 +24,16 @@ import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
-import com.cs253.appdebugger.benchmarking.Benchmarker;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
 
+import org.json.JSONObject;
+
 /**
  * Created by jason on 10/22/13.
  */
-public class AppDetails extends Activity implements OnClickListener {
+public class AppDetails extends Activity implements OnClickListener, Parcelable {
 
     App app;
     String packageName;
@@ -40,20 +46,22 @@ public class AppDetails extends Activity implements OnClickListener {
     TextView tvAppName;
     TextView tvAppVersion;
     TextView tvAppUid;
-    Context appContext;
+    Context context;
     CheckBox cbMonitorApp;
     Bundle extras;
     MonitorDataSource mds;
     Benchmarker benchmarker;
 
-
     protected void onCreate(Bundle savedInstance) {
+        // call our parent
         super.onCreate(savedInstance);
+
         // get our intent extras that we send to this class
         this.extras = getIntent().getExtras();
         // Set our application context, should we need it elsewhere in this class
-        this.appContext = getApplicationContext();
+        this.context = getApplicationContext();
 
+        /** Set up our database connections **/
         this.mds = new MonitorDataSource(this);
         this.mds.open();
 
@@ -61,12 +69,11 @@ public class AppDetails extends Activity implements OnClickListener {
         // query the packages and grab the necessary data
         initializePackageManager();
         initializeSelectedApplication();
-        // Initalize our monitor, so we know what the status of this app is
+
+        // Initialize our monitor, so we know what the status of this app is
         this.monitor = this.mds.selectMonitorByAppName(this.app.getPackageName());
         this.active = this.monitor.getActive();
         this.appName = this.monitor.getAppName();
-        // This has to instantiate after our app has been declared
-        this.benchmarker = new Benchmarker(this.app);
 
         // Draw our app details activity
         setContentView(R.layout.activity_appdetails);
@@ -109,7 +116,7 @@ public class AppDetails extends Activity implements OnClickListener {
                 this.app.setPackageName(pi.packageName);
                 this.app.setVersionName(pi.versionName);
                 this.app.setVersionCode(pi.versionCode);
-                Toast.makeText(this.appContext, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.context, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
                 this.app.setUid(ai.uid);
                 //this.app.setTitle(a.applicationInfo.)
 
@@ -143,22 +150,32 @@ public class AppDetails extends Activity implements OnClickListener {
     }
 
     /**
-     * Launch our app with debugging...
+     * BenchmarkApp works through 10 Steps, in which the first and last steps of the
+     * process are completed here.  The steps are starting the service and killing the
+     * service.
      */
-    public void debugApp(View v) {
+    public void benchmarkApp(View v) {
+        // Initialize an intent to our service that will monitor for stats gathering
+        Intent intent = new Intent(getApplicationContext(), AppDebuggerService.class);
+        // Put our app name in our intent so we have access to it in our service
+        intent.putExtra("app", this.app.getPackageName());
+        // start our service
+        this.context.startService(intent);
+        /*
         // Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
         long txData;
         if((txData = this.benchmarker.trafficMonitor.getTxBytes()) <= 0) {
             txData = this.benchmarker.trafficMonitor.getTxBytesManual();
         }
         Log.d("AppDebugger", "Traffic transmitted at this epoch: " + Long.toString(txData));
+        */
     }
 
     /**
      * Launch our App with no debugging...
      */
     public void launchApp(View v) {
-        Toast.makeText(this.appContext, "This is disabled for now", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.context, "This is disabled for now", Toast.LENGTH_SHORT).show();
         // Intent intent = this.packageManager.getLaunchIntentForPackage(this.app.getPackageName());
         // startActivity(intent);
     }
@@ -187,7 +204,7 @@ public class AppDetails extends Activity implements OnClickListener {
             this.mds.createOrUpdate(this.app.getPackageName(), false, "");
         } else {
             if(this.mds.deactivateMonitor(this.app.getPackageName())) {
-                Toast.makeText(this.appContext, "App has been successfully removed from debugging", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.context, "App has been successfully removed from debugging", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -217,4 +234,9 @@ public class AppDetails extends Activity implements OnClickListener {
         super.onDestroy();
         this.mds.close();
     }
+
+    /**
+     * Parceable methods go here
+     */
+        public
 }

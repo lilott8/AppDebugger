@@ -79,12 +79,6 @@ public class ListApps extends Activity implements OnItemClickListener {
         // add the listener to our listview
         mAppsList.setAdapter(mAdapter);
 
-        // Initialize an intent to our service that will monitor for stats gathering
-        Intent intent = new Intent(getApplicationContext(), AppDebuggerService.class);
-
-        // start our service
-        this.context.startService(intent);
-
         // Load our app's icons in the background so we don't leave our main thread
         // hangin if a problem arises
         new LoadIconsTask().execute(mApps.toArray(new App[]{}));

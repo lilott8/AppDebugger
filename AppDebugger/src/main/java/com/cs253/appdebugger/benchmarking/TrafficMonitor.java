@@ -16,19 +16,19 @@ import java.util.Arrays;
  */
 public class TrafficMonitor{
 
-    private App app;
+    private String packageName;
     private TrafficStats trafficStats;
     private long beforeStartup;
     private long afterStartup;
 
-    public TrafficMonitor(App whichApp) {
-        this.app = whichApp;
+    public TrafficMonitor(String packageName) {
+        this.packageName = packageName;
         this.trafficStats = new TrafficStats();
     }
 
     public long getTxBytes() {
 
-        Log.d("AppDebugger", "The UID for " + this.app.getPackageName() + " is " + Integer.toString(this.app.getUid()));
+        Log.d("AppDebugger", "The UID for " + this.packageName + " is " + Integer.toString(this.app.getUid()));
         return this.trafficStats.getUidTxBytes(this.app.getUid());
     }
 
