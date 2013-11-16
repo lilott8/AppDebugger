@@ -16,23 +16,35 @@ import java.util.Arrays;
  */
 public class TrafficMonitor{
 
-    private String packageName;
+    private App app;
     private TrafficStats trafficStats;
     private long beforeStartup;
     private long afterStartup;
 
-    public TrafficMonitor(String packageName) {
-        this.packageName = packageName;
+    public TrafficMonitor(App whichApp) {
+        this.app = whichApp;
         this.trafficStats = new TrafficStats();
     }
 
+    /**
+     * This method gets the total bytes transmitted by an app given a uid,
+     * if the API does not return a valid value, then we brute force the
+     * retrieval of the network statistics by going out to disk
+     * @return
+     *  a long that is the bytes that have been transmitted per app
+     */
     public long getTxBytes() {
+        long bytes = 0;
 
-        Log.d("AppDebugger", "The UID for " + this.packageName + " is " + Integer.toString(this.app.getUid()));
-        return this.trafficStats.getUidTxBytes(this.app.getUid());
+        if((bytes = this.trafficStats.getUidTxBytes(this.app.getUid())) < 1) {
+            bytes = this.getTxBytesManual();
+        }
+
+        Log.d("AppDebugger", "The UID for " + this.app.getPackageName() + " is " + Integer.toString(this.app.getUid()));
+        return bytes;
     }
 
-    public Long getTxBytesManual(){
+    private Long getTxBytesManual(){
 
         int localUid = this.app.getUid();
 

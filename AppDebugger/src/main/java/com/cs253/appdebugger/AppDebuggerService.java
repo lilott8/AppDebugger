@@ -3,20 +3,22 @@ package com.cs253.appdebugger;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 
 import com.cs253.appdebugger.benchmarking.Benchmarker;
-import com.cs253.appdebugger.database.MonitorDataSource;
 import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.benchmarking.Logger;
+import com.cs253.appdebugger.other.ParceableApp;
 
 import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -39,6 +41,7 @@ public class AppDebuggerService extends Service {
     private String packageName;
     private long startTs;
     private long endTs;
+    private App app;
 
     /**
      *
@@ -49,6 +52,15 @@ public class AppDebuggerService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        /**
+         *  These three longs will help us determine
+         *  the loading of an app.  When the size
+         *  between nowTx and PreviousTx are less
+         *  than delta, our app is "done" loading
+         */
+        long nowTx = 0;
+        long previousTx = 0;
+        long deltaTx = 1000;
         // initialize our data sources so we have DB connectivity
         this.statsDataSource = new StatsDataSource(this);
         this.statsDataSource.open();
@@ -58,22 +70,31 @@ public class AppDebuggerService extends Service {
         this.context = this.parentApp.getApplicationContext();
         // get our intent extras that we send to this class
         this.extras = intent.getExtras();
-        this.packageName = this.extras.getString("app");
-        this.benchmarker = new Benchmarker();
-
+        ParceableApp pa = this.extras.getParcelable("app");
+        this.app = pa.getApp();
+        this.benchmarker = new Benchmarker(this.app);
+        Toast.makeText(this.context, this.app.getPackageName().toString(), Toast.LENGTH_SHORT).show();
+        /**
+         * Get the tx size for our app
+         */
+        nowTx = this.benchmarker.trafficMonitor.getTxBytes();
         /**
          * Grab the timestamp of before we load our system
          */
         this.startTs = System.currentTimeMillis();
         /**
-         * Get the tx size for our app
-         */
-
-        /**
          * Start the app
          */
-        Intent benchmarkIntent = getPackageManager().getLaunchIntentForPackage(this.packageName);
-        startActivity(benchmarkIntent);
+        Intent benchmarkIntent = getPackageManager().getLaunchIntentForPackage(this.app.getPackageName());
+        if(benchmarkIntent != null) {
+            startActivity(benchmarkIntent);
+        } else {
+            try {
+                Log.d("AppDebugger", "We cannot open this intent because it's null???? " + benchmarkIntent.toString());
+            } catch (Exception e) {
+                Log.d("AppDebugger", "the benchmarkIntent is null :(");
+            }
+        }
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -81,23 +102,27 @@ public class AppDebuggerService extends Service {
          *  get new now
          * }
          */
-
+            while(Math.abs(nowTx - previousTx) > deltaTx) {
+                previousTx = nowTx;
+                nowTx = this.benchmarker.trafficMonitor.getTxBytes();
+                Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
+            }
         /**
          * grab a new timestamp, our app is "done loading"
          */
         this.endTs = System.currentTimeMillis();
+        Long total = this.endTs - this.startTs;
+        Log.d("AppDebugger", "It took " + this.app.getLabel() + " " + Long.toString(total) + " milliseconds to load");
         /**
          * Store our results in our table
+         * The nowTx will always house our last
+         * amount of traffic sent
          */
-
+        this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
         /**
          * Kill the service
          */
-
-
-        //TODO this will control our logic
-        // new readLogsTask().execute();
-        //Toast.makeText(getApplicationContext(), "service started...", Toast.LENGTH_LONG).show();
+        
         return Service.START_NOT_STICKY;
     }
 

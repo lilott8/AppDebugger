@@ -24,6 +24,7 @@ import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
+import com.cs253.appdebugger.other.ParceableApp;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -33,7 +34,7 @@ import org.json.JSONObject;
 /**
  * Created by jason on 10/22/13.
  */
-public class AppDetails extends Activity implements OnClickListener, Parcelable {
+public class AppDetails extends Activity implements OnClickListener {
 
     App app;
     String packageName;
@@ -155,10 +156,11 @@ public class AppDetails extends Activity implements OnClickListener, Parcelable 
      * service.
      */
     public void benchmarkApp(View v) {
+        ParceableApp pa = new ParceableApp(this.app);
         // Initialize an intent to our service that will monitor for stats gathering
         Intent intent = new Intent(getApplicationContext(), AppDebuggerService.class);
         // Put our app name in our intent so we have access to it in our service
-        intent.putExtra("app", this.app.getPackageName());
+        intent.putExtra("app", pa);
         // start our service
         this.context.startService(intent);
         /*
@@ -234,9 +236,4 @@ public class AppDetails extends Activity implements OnClickListener, Parcelable 
         super.onDestroy();
         this.mds.close();
     }
-
-    /**
-     * Parceable methods go here
-     */
-        public
 }
