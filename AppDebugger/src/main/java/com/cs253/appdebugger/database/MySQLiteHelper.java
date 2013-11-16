@@ -36,7 +36,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String MONITOR_CREATE = "create table " + TABLE_MONITOR + " (" +
             _ID + " integer primary key autoincrement, " +
-            APP_NAME + " varchar(255) unique not null, " +
+            APP_NAME + " varchar(255) not null, " +
             ACTIVE + " boolean false, " +
             ACTIVITY_NAMES + " text null );";
     private Context context;

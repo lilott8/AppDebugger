@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * Created by jason on 10/25/13.
@@ -62,18 +63,23 @@ public class StatsDataSource {
         values.put(MySQLiteHelper.START_TIME, start_time);
         values.put(MySQLiteHelper.END_TIME, end_time);
         values.put(MySQLiteHelper.DATA_SENT, data_sent);
-        // insert the record
-        long insertId = this.database.insert(MySQLiteHelper.TABLE_STATS, null, values);
-        // grab the newest record from our db
-        Cursor cursor = this.database.query(MySQLiteHelper.TABLE_STATS, this.allColumns,
-                MySQLiteHelper._ID + " = " + insertId, null, null, null, null);
-        // We want the first returned value
-        cursor.moveToFirst();
-        // convert our cursor record to a stats object
-        Stats stats = cursorToStats(cursor);
-        // close the cursor/remove the cursor object
-        cursor.close();
-        return stats;
+        // Attempt to insert the record
+        try {
+            long insertId = this.database.insert(MySQLiteHelper.TABLE_STATS, null, values);
+            // grab the newest record from our db
+            Cursor cursor = this.database.query(MySQLiteHelper.TABLE_STATS, this.allColumns,
+                    MySQLiteHelper._ID + " = " + insertId, null, null, null, null);
+            // We want the first returned value
+            cursor.moveToFirst();
+            // convert our cursor record to a stats object
+            Stats stats = cursorToStats(cursor);
+            // close the cursor/remove the cursor object
+            cursor.close();
+            return stats;
+        } catch (SQLException e) {
+            Log.d("AppDebugger", "We couldn't insert: " + e.toString());
+            return null;
+        }
     }
 
 

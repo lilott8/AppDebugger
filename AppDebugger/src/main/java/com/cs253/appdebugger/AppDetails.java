@@ -90,6 +90,7 @@ public class AppDetails extends Activity implements OnClickListener {
         this.cbMonitorApp.setChecked(this.active);
 
         // Log.d("AppDebugger", "Uid is: " + Integer.toString(this.app.getUid()));
+        Toast.makeText(this.context, "PackageName: " + this.app.getPackageName(), Toast.LENGTH_SHORT).show();
 
         // Add to those views what we need
         this.tvAppVersion.setText(Integer.toString(this.app.getUid()));
@@ -112,20 +113,22 @@ public class AppDetails extends Activity implements OnClickListener {
                 // Get the package info from our package manager
                 PackageInfo pi = this.packageManager.getPackageInfo(this.packageName, 0);
 
-                this.app.setPackageName(pi.applicationInfo.name);
-                //this.app.setTitle(a.loadLabel(this.packageManager).toString());
                 this.app.setPackageName(pi.packageName);
+                if(this.app.getPackageName().length() < 1) {
+                    this.app.setPackageName(pi.applicationInfo.name);
+                }
+                //this.app.setTitle(a.loadLabel(this.packageManager).toString());
                 this.app.setVersionName(pi.versionName);
                 this.app.setVersionCode(pi.versionCode);
-                Toast.makeText(this.context, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(this.context, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
                 this.app.setUid(ai.uid);
                 //this.app.setTitle(a.applicationInfo.)
 
                 CharSequence label = ai.loadLabel(this.packageManager);
-                this.app.setLabel(label != null ? label.toString() : "No Label Provided");
+                this.app.setLabel(label != null ? label.toString() : "No label provided");
 
                 CharSequence description = ai.loadDescription(this.packageManager);
-                this.app.setDescription(description != null ? description.toString() : "");
+                this.app.setDescription(description != null ? description.toString() : "No description available");
 
                 // this.packageManager.getApplicationInfo(this.packageName, PackageManager.GET_META_DATA);
                 // setAppName(this.app.packageName);

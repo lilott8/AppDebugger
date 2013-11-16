@@ -102,10 +102,18 @@ public class AppDebuggerService extends Service {
          *  get new now
          * }
          */
+        // just a small fail-safe, I know this technically adds to the loading time,
+        // but I want to rule out some silly loop problems.
+        int i = 0;
             while(Math.abs(nowTx - previousTx) > deltaTx) {
-                previousTx = nowTx;
-                nowTx = this.benchmarker.trafficMonitor.getTxBytes();
-                Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
+                if(10000 > i) {
+                    previousTx = nowTx;
+                    nowTx = this.benchmarker.trafficMonitor.getTxBytes();
+                    Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
+                    i++;
+                } else {
+                    break;
+                }
             }
         /**
          * grab a new timestamp, our app is "done loading"
@@ -120,10 +128,11 @@ public class AppDebuggerService extends Service {
          */
         this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
         /**
-         * Kill the service
+         * Kill the service??
          */
-        
-        return Service.START_NOT_STICKY;
+        this.context.stopService(new Intent(this.context, this.getClass()));
+
+        return -1;
     }
 
     @Override
