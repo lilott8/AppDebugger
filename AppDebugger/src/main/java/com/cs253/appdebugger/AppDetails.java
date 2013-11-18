@@ -90,7 +90,7 @@ public class AppDetails extends Activity implements OnClickListener {
         this.cbMonitorApp.setChecked(this.active);
 
         // Log.d("AppDebugger", "Uid is: " + Integer.toString(this.app.getUid()));
-        Toast.makeText(this.context, "PackageName: " + this.app.getPackageName(), Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this.context, "PackageName: " + this.app.getPackageName(), Toast.LENGTH_SHORT).show();
 
         // Add to those views what we need
         this.tvAppVersion.setText(Integer.toString(this.app.getUid()));

@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.cs253.appdebugger.benchmarking.Benchmarker;
+import com.cs253.appdebugger.database.Stats;
 import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.benchmarking.Logger;
+import com.cs253.appdebugger.other.HttpRequest;
 import com.cs253.appdebugger.other.ParcelableApp;
 
 import java.security.Timestamp;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ public class AppBenchmarkService extends Service {
     private String packageName;
     private long startTs;
     private long endTs;
+    private long totalTx;
     private App app;
     private boolean serviceStarted;
 
@@ -53,15 +57,46 @@ public class AppBenchmarkService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        // Just a way to group and consolidate various actions
+        this.initializeVariables();
+
+        // get our intent extras that we send to this class
+        this.extras = intent.getExtras();
+        ParcelableApp pa = this.extras.getParcelable("app");
+        this.app = pa.getApp();
+        this.benchmarker = new Benchmarker(this.app);
+        // Toast.makeText(this.context, "The package name is: "+this.app.getPackageName(), Toast.LENGTH_SHORT).show();
+/*
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                measureNetworkUse();
+           }
+        });
+        t.start();
+*/
+        this.measureNetworkUse();
         /**
-         *  These three longs will help us determine
-         *  the loading of an app.  When the size
-         *  between nowTx and PreviousTx are less
-         *  than delta, our app is "done" loading
+         * Store our results in our table
+         * The totalTx will be the initial - now
+         * amount of traffic sent
          */
-        long nowTx = 0;
-        long previousTx = 0;
-        long deltaTx = 1000;
+        Stats s = this.statsDataSource.createStats(this.startTs, this.endTs, this.app.getPackageName(), totalTx);
+        if (s.getId() > 0) {
+            Log.d("AppDebugger", "Our insert happened successfully");
+        } else {
+            Log.d("AppDebugger", "Our insert failed :(");
+        }
+        //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
+        //this.postDataToExcel(this.totalTx);
+        /**
+         *  We don't need to kill the service, we can continually
+         *  call this and pass data into this service
+         */
+        return START_STICKY;
+    }
+
+    private void initializeVariables() {
         // initialize our data sources so we have DB connectivity
         this.statsDataSource = new StatsDataSource(this);
         this.statsDataSource.open();
@@ -69,12 +104,19 @@ public class AppBenchmarkService extends Service {
         // get our application context
         this.parentApp = getApplication();
         this.context = this.parentApp.getApplicationContext();
-        // get our intent extras that we send to this class
-        this.extras = intent.getExtras();
-        ParcelableApp pa = this.extras.getParcelable("app");
-        this.app = pa.getApp();
-        this.benchmarker = new Benchmarker(this.app);
-        Toast.makeText(this.context, "The package name is: "+this.app.getPackageName(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void measureNetworkUse() {
+        /**
+         *  These three longs will help us determine
+         *  the loading of an app.  When the size
+         *  between nowTx and PreviousTx are less
+         *  than delta, our app is "done" loading
+         */
+        long initialTx = 0;
+        long nowTx = 0;
+        long previousTx = 0;
+        long deltaTx = 100;
         /**
          * Get the tx size for our app
          */
@@ -90,12 +132,14 @@ public class AppBenchmarkService extends Service {
         if(benchmarkIntent != null) {
             startActivity(benchmarkIntent);
         } else {
-            try {
-                Log.d("AppDebugger", "We cannot open this intent because it's null???? " + benchmarkIntent.toString());
-            } catch (Exception e) {
-                Log.d("AppDebugger", "the benchmarkIntent is null :(");
-            }
+            Log.d("AppDebugger", "Benchmark Intent is null!");
         }
+        // just a small fail-safe, I know this technically adds to the loading time,
+        // but I want to rule out some silly loop problems.
+        int i = 0;
+        // This is our initial data sent, this will be used to calculate our total
+        // data sent for this app.
+        initialTx = this.benchmarker.trafficMonitor.getTxBytes();
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -103,37 +147,24 @@ public class AppBenchmarkService extends Service {
          *  get new now
          * }
          */
-        // just a small fail-safe, I know this technically adds to the loading time,
-        // but I want to rule out some silly loop problems.
-        int i = 0;
-            while(Math.abs(nowTx - previousTx) > deltaTx) {
-                if(10000 > i) {
-                    previousTx = nowTx;
-                    nowTx = this.benchmarker.trafficMonitor.getTxBytes();
-                    Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
-                    i++;
-                } else {
-                    break;
-                }
+        while((Math.abs(nowTx - previousTx) > deltaTx) || i < 1000) {
+            if(10000 > i) {
+                previousTx = nowTx;
+                nowTx = this.benchmarker.trafficMonitor.getTxBytes();
+                //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
+                i++;
+            } else {
+                break;
             }
+        }
         /**
          * grab a new timestamp, our app is "done loading"
          */
         this.endTs = System.currentTimeMillis();
         Long total = this.endTs - this.startTs;
         Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " + Long.toString(total) + " milliseconds to load");
-        /**
-         * Store our results in our table
-         * The nowTx will always house our last
-         * amount of traffic sent
-         */
-        //this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
-        Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
-        /**
-         *  We don't need to kill the service, we can continually
-         *  call this and pass data into this service
-         */
-        return START_STICKY;
+
+        this.totalTx = Math.abs(nowTx - initialTx);
     }
 
     @Override
@@ -163,5 +194,22 @@ public class AppBenchmarkService extends Service {
 
     public void onDestroy() {
         this.statsDataSource.close();
+    }
+
+
+
+    public void postDataToExcel(long tx) {
+        String fullUrl = "https://docs.google.com/spreadsheet/ccc?key=0Amvx1dwnifmYdGZBRzFDYXFsMGhEc0pZZE1yR3Q3cVE#gid=0"; // insert google doc url here
+        HttpRequest mReq = new HttpRequest();
+        // Place your columns here:
+        int col1 = 0;
+      //  int col2 = TelephonyManager.getDeviceId();
+        String col3 = this.app.getPackageName();
+        long col4 = this.startTs;
+        long col5 = this.endTs;
+        long col6 = this.totalTx;
+
+        String data = "";
+        String response = mReq.sendPost(fullUrl, data);
     }
 }
