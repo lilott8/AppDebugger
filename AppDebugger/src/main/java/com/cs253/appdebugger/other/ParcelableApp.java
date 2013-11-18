@@ -26,6 +26,7 @@ public class ParcelableApp implements Parcelable{
         this.app.setDescription(in.readString());
         this.app.setUid(in.readInt());
         this.app.setVersionCode(in.readInt());
+        this.app.setVersionName(in.readString());
         this.app.setLabel(in.readString());
         this.app.setTitle(in.readString());
         this.app.setPackageName(in.readString());
@@ -41,7 +42,7 @@ public class ParcelableApp implements Parcelable{
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(this.app.getDescription());
-        parcel.writeLong(this.app.getUid());
+        parcel.writeInt(this.app.getUid());
         parcel.writeInt(this.app.getVersionCode());
         parcel.writeString(this.app.getVersionName());
         parcel.writeString(this.app.getLabel());

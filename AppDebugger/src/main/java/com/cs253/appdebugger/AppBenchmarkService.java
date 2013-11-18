@@ -130,7 +130,8 @@ public class AppBenchmarkService extends Service {
         //this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
         Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         /**
-         * Kill the service??
+         *  We don't need to kill the service, we can continually
+         *  call this and pass data into this service
          */
         return START_STICKY;
     }
