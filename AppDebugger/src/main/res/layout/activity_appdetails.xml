@@ -58,6 +58,6 @@
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:id="@+id/buttonDebugApp"
-				android:text="@string/buttonDebugApp"
+				android:text="@string/buttonBenchmarkApp"
 				android:onClick="benchmarkApp"/>
 </LinearLayout>

@@ -39,7 +39,7 @@
 			android:name=".AppDetails"
 			android:label="@string/app_name">
 		</activity>
-		<service android:name="AppDebuggerService"
+		<service android:name=".AppBenchmarkService"
 				 android:icon="@drawable/icon"
 				 android:label="@string/appDebuggerService">
 			</service>

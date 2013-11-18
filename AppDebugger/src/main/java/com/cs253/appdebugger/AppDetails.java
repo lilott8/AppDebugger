@@ -24,7 +24,7 @@ import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
-import com.cs253.appdebugger.other.ParceableApp;
+import com.cs253.appdebugger.other.ParcelableApp;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -98,7 +98,7 @@ public class AppDetails extends Activity implements OnClickListener {
         this.tvAppVersion.setText(Integer.toString(this.app.getVersionCode()));
         this.cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
         //Toast.makeText(this.appContext, this.getAppName(), Toast.LENGTH_LONG).show();
-        checkForOtherActivities();
+        //checkForOtherActivities();
     }
 
     private void initializeSelectedApplication() {
@@ -159,9 +159,9 @@ public class AppDetails extends Activity implements OnClickListener {
      * service.
      */
     public void benchmarkApp(View v) {
-        ParceableApp pa = new ParceableApp(this.app);
+        ParcelableApp pa = new ParcelableApp(this.app);
         // Initialize an intent to our service that will monitor for stats gathering
-        Intent intent = new Intent(getApplicationContext(), AppDebuggerService.class);
+        Intent intent = new Intent(getApplicationContext(), AppBenchmarkService.class);
         // Put our app name in our intent so we have access to it in our service
         intent.putExtra("app", pa);
         // start our service

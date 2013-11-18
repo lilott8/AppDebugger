@@ -65,8 +65,15 @@ public class StatsDataSource {
         values.put(MySQLiteHelper.DATA_SENT, data_sent);
         // Attempt to insert the record
         try {
+            /**
+             * Insert into stats ( app_name, start_time, end_time, data_sent) VALUES
+             * (value 1, value 2, value 3, value 4);
+             */
             long insertId = this.database.insert(MySQLiteHelper.TABLE_STATS, null, values);
             // grab the newest record from our db
+            /**
+             * Select * from stats where _ID = insert_id from above
+             */
             Cursor cursor = this.database.query(MySQLiteHelper.TABLE_STATS, this.allColumns,
                     MySQLiteHelper._ID + " = " + insertId, null, null, null, null);
             // We want the first returned value
@@ -84,8 +91,9 @@ public class StatsDataSource {
 
 
     public Stats cursorToStats(Cursor cursor) {
+        Log.d("AppDebugger", "The packagename should be: "+cursor.getString(1));
         Stats stats = new Stats();
-        stats.setAppName(cursor.getString(1));
+        stats.setPackageName(cursor.getString(1));
         stats.setDataSent(cursor.getLong(4));
         stats.setEndTime(cursor.getLong(3));
         stats.setId(cursor.getLong(0));

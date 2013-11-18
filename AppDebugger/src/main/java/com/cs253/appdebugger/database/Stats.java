@@ -38,11 +38,11 @@ public class Stats {
         this.end_time = end;
     }
 
-    public String getAppName() {
+    public String getPackageName() {
         return this.app_name;
     }
 
-    public void setAppName(String app) {
+    public void setPackageName(String app) {
         this.app_name = app;
     }
 

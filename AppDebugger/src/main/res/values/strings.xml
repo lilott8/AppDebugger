@@ -13,7 +13,7 @@
 	<string name="labelAppName">App Name:</string>
 	<string name="textViewAppName"></string>
 	<string name="buttonLaunchApp">Launch Application</string>
-	<string name="buttonDebugApp">Debug Application</string>
+	<string name="buttonBenchmarkApp">Benchmark Application</string>
 	<string name="appDebuggerService">Hello World!</string>
 	<string name="appDebuggerMonitor"></string>
     <string name="labelAppUID">AppUID:</string>

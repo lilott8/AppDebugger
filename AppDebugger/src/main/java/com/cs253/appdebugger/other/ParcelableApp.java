@@ -2,25 +2,26 @@ package com.cs253.appdebugger.other;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.cs253.appdebugger.App;
 
 /**
  * Created by jason on 11/15/13.
  */
-public class ParceableApp implements Parcelable{
+public class ParcelableApp implements Parcelable{
     private App app;
 
     public App getApp() {
         return this.app;
     }
 
-    public ParceableApp(App app) {
+    public ParcelableApp(App whichApp) {
         super();
-        this.app = app;
+        this.app = whichApp;
     }
 
-    private ParceableApp(Parcel in) {
+    private ParcelableApp(Parcel in) {
         this.app = new App();
         this.app.setDescription(in.readString());
         this.app.setUid(in.readInt());
@@ -51,14 +52,14 @@ public class ParceableApp implements Parcelable{
     /**
      * Our mandatory Creator interface
      */
-    public static final ParceableApp.Creator<ParceableApp> CREATOR =
-            new ParceableApp.Creator<ParceableApp>() {
-                public ParceableApp createFromParcel(Parcel in) {
-                    return new ParceableApp(in);
+    public static final ParcelableApp.Creator<ParcelableApp> CREATOR =
+            new ParcelableApp.Creator<ParcelableApp>() {
+                public ParcelableApp createFromParcel(Parcel in) {
+                    return new ParcelableApp(in);
                 }
 
-                public ParceableApp[] newArray(int size) {
-                    return new ParceableApp[size];
+                public ParcelableApp[] newArray(int size) {
+                    return new ParcelableApp[size];
                 }
             };
 }

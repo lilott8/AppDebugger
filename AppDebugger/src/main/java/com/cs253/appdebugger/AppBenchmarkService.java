@@ -11,7 +11,7 @@ import android.os.IBinder;
 import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.benchmarking.Logger;
-import com.cs253.appdebugger.other.ParceableApp;
+import com.cs253.appdebugger.other.ParcelableApp;
 
 import java.security.Timestamp;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import android.widget.Toast;
 /**
  * Created by jason on 10/24/13.
  */
-public class AppDebuggerService extends Service {
+public class AppBenchmarkService extends Service {
 
     // Our database connections
     private StatsDataSource statsDataSource;
@@ -42,6 +42,7 @@ public class AppDebuggerService extends Service {
     private long startTs;
     private long endTs;
     private App app;
+    private boolean serviceStarted;
 
     /**
      *
@@ -70,10 +71,10 @@ public class AppDebuggerService extends Service {
         this.context = this.parentApp.getApplicationContext();
         // get our intent extras that we send to this class
         this.extras = intent.getExtras();
-        ParceableApp pa = this.extras.getParcelable("app");
+        ParcelableApp pa = this.extras.getParcelable("app");
         this.app = pa.getApp();
         this.benchmarker = new Benchmarker(this.app);
-        Toast.makeText(this.context, this.app.getPackageName().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.context, "The package name is: "+this.app.getPackageName(), Toast.LENGTH_SHORT).show();
         /**
          * Get the tx size for our app
          */
@@ -120,19 +121,18 @@ public class AppDebuggerService extends Service {
          */
         this.endTs = System.currentTimeMillis();
         Long total = this.endTs - this.startTs;
-        Log.d("AppDebugger", "It took " + this.app.getLabel() + " " + Long.toString(total) + " milliseconds to load");
+        Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " + Long.toString(total) + " milliseconds to load");
         /**
          * Store our results in our table
          * The nowTx will always house our last
          * amount of traffic sent
          */
-        this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
+        //this.statsDataSource.createStats(startTs, endTs, this.app.getPackageName(), nowTx);
+        Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         /**
          * Kill the service??
          */
-        this.context.stopService(new Intent(this.context, this.getClass()));
-
-        return -1;
+        return START_STICKY;
     }
 
     @Override
