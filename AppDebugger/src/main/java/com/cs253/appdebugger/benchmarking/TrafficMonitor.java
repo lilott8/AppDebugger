@@ -39,8 +39,6 @@ public class TrafficMonitor{
         if((bytes = this.trafficStats.getUidTxBytes(this.app.getUid())) < 1) {
             bytes = this.getTxBytesManual();
         }
-
-        Log.d("AppDebugger", "The UID for " + this.app.getPackageName() + " is " + Integer.toString(this.app.getUid()));
         return bytes;
     }
 

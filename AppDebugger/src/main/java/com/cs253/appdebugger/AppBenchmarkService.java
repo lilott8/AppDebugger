@@ -5,9 +5,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.cs253.appdebugger.GoogleFormUploader.GoogleFormUploader;
 import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.Stats;
 import com.cs253.appdebugger.database.StatsDataSource;
@@ -88,7 +90,7 @@ public class AppBenchmarkService extends Service {
             Log.d("AppDebugger", "Our insert failed :(");
         }
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
-        //this.postDataToExcel(this.totalTx);
+        this.postDataToForm();
         /**
          *  We don't need to kill the service, we can continually
          *  call this and pass data into this service
@@ -198,18 +200,27 @@ public class AppBenchmarkService extends Service {
 
 
 
-    public void postDataToExcel(long tx) {
-        String fullUrl = "https://docs.google.com/spreadsheet/ccc?key=0Amvx1dwnifmYdGZBRzFDYXFsMGhEc0pZZE1yR3Q3cVE#gid=0"; // insert google doc url here
-        HttpRequest mReq = new HttpRequest();
-        // Place your columns here:
-        int col1 = 0;
-      //  int col2 = TelephonyManager.getDeviceId();
-        String col3 = this.app.getPackageName();
-        long col4 = this.startTs;
-        long col5 = this.endTs;
-        long col6 = this.totalTx;
-
-        String data = "";
-        String response = mReq.sendPost(fullUrl, data);
+    public void postDataToForm() {
+        GoogleFormUploader uploader = new GoogleFormUploader("1wfat45AiYejUmO2yRu5Rj3kOcy-IGgVdyTKr13I5wwo");
+        // Phone UID
+        try{
+            final TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String deviceID = tm.getDeviceId();
+            uploader.addEntry("1592233968", deviceID);
+        } catch (Exception e) {
+            uploader.addEntry("1592233968", "handledexception");
+        }
+        // PackageName
+        uploader.addEntry("1419678310", this.app.getPackageName());
+        // StartTs
+        uploader.addEntry("955660800", Long.toString(this.startTs));
+        // EndTs
+        uploader.addEntry("1827012614", Long.toString(this.endTs));
+        // TotalTx
+        uploader.addEntry("1320577572", Long.toString(this.totalTx));
+        // Android Version
+        uploader.addEntry("1037276429", Build.VERSION.RELEASE);
+        // Upload the data
+        uploader.upload();
     }
 }
