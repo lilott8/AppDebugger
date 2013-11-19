@@ -16,22 +16,22 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String APP_NAME = "app_name";
     // Stats columns
     public static final String TABLE_STATS = "stats";
-    public static final String START_TIME = "start_time";
-    public static final String END_TIME = "end_time";
+    public static final String APP_LOAD_TIME = "app_load_time";
     public static final String DATA_SENT = "data_sent";
+    public static final String NIC_LOAD_TIME = "nic_load_time";
     // Monitor columns
     public static final String TABLE_MONITOR = "monitor";
     public static final String ACTIVE = "active";
     public static final String ACTIVITY_NAMES = "activities";
     // Database "stuff"
     public static final String DATABASE_NAME = "appDebugger.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String STATS_CREATE = "create table " + TABLE_STATS + " (" +
             _ID + " integer primary key autoincrement, " +
             APP_NAME + " varchar(255) unique not null, " +
-            START_TIME + " unsigned bigint, " +
-            END_TIME + " unsigned bigint, " +
+            APP_LOAD_TIME + " unsigned bigint, " +
+            NIC_LOAD_TIME + " unsigned bigint, " +
             DATA_SENT + " unsigned bigint)";
 
     private static final String MONITOR_CREATE = "create table " + TABLE_MONITOR + " (" +

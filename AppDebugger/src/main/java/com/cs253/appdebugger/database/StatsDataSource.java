@@ -22,7 +22,7 @@ public class StatsDataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbhelper;
     private String[] allColumns = {MySQLiteHelper._ID, MySQLiteHelper.APP_NAME,
-            MySQLiteHelper.START_TIME, MySQLiteHelper.END_TIME, MySQLiteHelper.DATA_SENT};
+            MySQLiteHelper.APP_LOAD_TIME, MySQLiteHelper.DATA_SENT};
 
     public StatsDataSource(Context context) {
         this.dbhelper = new MySQLiteHelper(context);
@@ -56,12 +56,12 @@ public class StatsDataSource {
         return stats;
     }
 
-    public Stats createStats(long start_time, long end_time, String app_name, long data_sent) {
+    public Stats createStats(long app_load_time, String app_name, long data_sent, long nic_load_time) {
         ContentValues values = new ContentValues();
         // Get the values ready for insert
         values.put(MySQLiteHelper.APP_NAME, app_name);
-        values.put(MySQLiteHelper.START_TIME, start_time);
-        values.put(MySQLiteHelper.END_TIME, end_time);
+        values.put(MySQLiteHelper.APP_LOAD_TIME, app_load_time);
+        values.put(MySQLiteHelper.NIC_LOAD_TIME, nic_load_time);
         values.put(MySQLiteHelper.DATA_SENT, data_sent);
         // Attempt to insert the record
         try {
@@ -95,9 +95,9 @@ public class StatsDataSource {
         Stats stats = new Stats();
         stats.setPackageName(cursor.getString(1));
         stats.setDataSent(cursor.getLong(4));
-        stats.setEndTime(cursor.getLong(3));
         stats.setId(cursor.getLong(0));
-        stats.setStartTime(cursor.getLong(2));
+        stats.setAppLoadTime(cursor.getLong(2));
+        stats.setNicLoadTime(cursor.getLong(3));
         return stats;
     }
 }

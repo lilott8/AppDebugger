@@ -191,7 +191,7 @@ public class AppDetails extends Activity implements OnClickListener {
      */
     public void monitorApp(View v) {
         Toast.makeText(getApplicationContext(), "Debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long data = this.benchmarker.trafficMonitor.getTxBytes();
+        long data = this.benchmarker.nm.getTxBytes();
         Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
 
         //TODO: parse logcat for specific app

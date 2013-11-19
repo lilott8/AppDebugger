@@ -3,7 +3,6 @@ package com.cs253.appdebugger;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,20 +10,17 @@ import android.os.IBinder;
 
 import com.cs253.appdebugger.GoogleFormUploader.GoogleFormUploader;
 import com.cs253.appdebugger.benchmarking.Benchmarker;
+import com.cs253.appdebugger.benchmarking.NetworkMonitor;
 import com.cs253.appdebugger.database.Stats;
 import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.benchmarking.Logger;
-import com.cs253.appdebugger.other.HttpRequest;
 import com.cs253.appdebugger.other.ParcelableApp;
-
-import java.security.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
+
+import java.util.Arrays;
 
 /**
  * Created by jason on 10/24/13.
@@ -42,14 +38,9 @@ public class AppBenchmarkService extends Service {
     // Maintain ties to our context so we can use Toast for debugging
     private Context context;
     private Bundle extras;
-    // Which app we are monitoring
-    private String packageName;
-    private long startTs;
-    private long endTs;
-    private long totalTx;
     private App app;
-    private boolean serviceStarted;
-
+    private long appLoadTime;
+    private long nicLoadTime;
     /**
      *
      * @param intent
@@ -59,6 +50,7 @@ public class AppBenchmarkService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        long[] times = new long[4];
         // Just a way to group and consolidate various actions
         this.initializeVariables();
 
@@ -66,7 +58,7 @@ public class AppBenchmarkService extends Service {
         this.extras = intent.getExtras();
         ParcelableApp pa = this.extras.getParcelable("app");
         this.app = pa.getApp();
-        this.benchmarker = new Benchmarker(this.app);
+        this.benchmarker = new Benchmarker(this.app, this);
         // Toast.makeText(this.context, "The package name is: "+this.app.getPackageName(), Toast.LENGTH_SHORT).show();
 /*
         Thread t = new Thread(new Runnable() {
@@ -77,27 +69,42 @@ public class AppBenchmarkService extends Service {
         });
         t.start();
 */
-        this.measureNetworkUse();
-        /**
-         * Store our results in our table
-         * The totalTx will be the initial - now
-         * amount of traffic sent
-         */
-        Stats s = this.statsDataSource.createStats(this.startTs, this.endTs, this.app.getPackageName(), totalTx);
+        // get our nic state change time
+        this.nicLoadTime = System.currentTimeMillis();
+        this.benchmarker.nm.measureNetworkState();
+        this.nicLoadTime = System.currentTimeMillis() - this.nicLoadTime;
+
+        // get our network load time!
+        this.appLoadTime = System.currentTimeMillis();
+        this.benchmarker.nm.measureNetworkUse();
+        this.appLoadTime = System.currentTimeMillis() - this.appLoadTime;
+
+        Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " +
+                Long.toString(this.appLoadTime) + " milliseconds to load");
+
+        // Store our results in our table
+        // The totalTx will be the initial - now
+        // amount of traffic sent
+        Stats s = this.statsDataSource.createStats(this.appLoadTime, this.app.getPackageName(),
+                this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime);
+
         if (s.getId() > 0) {
             Log.d("AppDebugger", "Our insert happened successfully");
         } else {
-            Log.d("AppDebugger", "Our insert failed :(");
+            Log.e("AppDebugger", "Our insert failed :(");
         }
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         this.postDataToForm();
-        /**
-         *  We don't need to kill the service, we can continually
-         *  call this and pass data into this service
-         */
+
         return START_STICKY;
     }
 
+    /**
+     *  Because there is no constructor here, I made this
+     *  That way we can simplify the creation of variables
+     *  and then allow for more logic based instructions
+     *  to reside in the "onCreate()" method
+     */
     private void initializeVariables() {
         // initialize our data sources so we have DB connectivity
         this.statsDataSource = new StatsDataSource(this);
@@ -108,65 +115,8 @@ public class AppBenchmarkService extends Service {
         this.context = this.parentApp.getApplicationContext();
     }
 
-    private void measureNetworkUse() {
-        /**
-         *  These three longs will help us determine
-         *  the loading of an app.  When the size
-         *  between nowTx and PreviousTx are less
-         *  than delta, our app is "done" loading
-         */
-        long initialTx = 0;
-        long nowTx = 0;
-        long previousTx = 0;
-        long deltaTx = 100;
-        /**
-         * Get the tx size for our app
-         */
-        nowTx = this.benchmarker.trafficMonitor.getTxBytes();
-        /**
-         * Grab the timestamp of before we load our system
-         */
-        this.startTs = System.currentTimeMillis();
-        /**
-         * Start the app
-         */
-        Intent benchmarkIntent = getPackageManager().getLaunchIntentForPackage(this.app.getPackageName());
-        if(benchmarkIntent != null) {
-            startActivity(benchmarkIntent);
-        } else {
-            Log.d("AppDebugger", "Benchmark Intent is null!");
-        }
-        // just a small fail-safe, I know this technically adds to the loading time,
-        // but I want to rule out some silly loop problems.
-        int i = 0;
-        // This is our initial data sent, this will be used to calculate our total
-        // data sent for this app.
-        initialTx = this.benchmarker.trafficMonitor.getTxBytes();
-        /**
-         * Measure the deltas of tx sizes
-         * while (previous-now) > delta) {
-         *  move now to previous
-         *  get new now
-         * }
-         */
-        while((Math.abs(nowTx - previousTx) > deltaTx) || i < 1000) {
-            if(10000 > i) {
-                previousTx = nowTx;
-                nowTx = this.benchmarker.trafficMonitor.getTxBytes();
-                //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
-                i++;
-            } else {
-                break;
-            }
-        }
-        /**
-         * grab a new timestamp, our app is "done loading"
-         */
-        this.endTs = System.currentTimeMillis();
-        Long total = this.endTs - this.startTs;
-        Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " + Long.toString(total) + " milliseconds to load");
+    public void measureNetworkState() {
 
-        this.totalTx = Math.abs(nowTx - initialTx);
     }
 
     @Override
@@ -195,6 +145,7 @@ public class AppBenchmarkService extends Service {
     }
 
     public void onDestroy() {
+        // Close our data source when the service is ended
         this.statsDataSource.close();
     }
 
@@ -212,12 +163,12 @@ public class AppBenchmarkService extends Service {
         }
         // PackageName
         uploader.addEntry("1419678310", this.app.getPackageName());
-        // StartTs
-        uploader.addEntry("955660800", Long.toString(this.startTs));
-        // EndTs
-        uploader.addEntry("1827012614", Long.toString(this.endTs));
-        // TotalTx
-        uploader.addEntry("1320577572", Long.toString(this.totalTx));
+        // AppLoadTime
+        uploader.addEntry("955660800", Long.toString(this.appLoadTime));
+        // NicLoadTime
+        uploader.addEntry("1981683208", Long.toString(this.nicLoadTime));
+        // TotalDataSent
+        uploader.addEntry("1320577572", Long.toString(this.benchmarker.nm.getTotalBytesSent()));
         // Android Version
         uploader.addEntry("1037276429", Build.VERSION.RELEASE);
         // Upload the data

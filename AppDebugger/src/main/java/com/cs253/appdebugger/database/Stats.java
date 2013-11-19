@@ -6,9 +6,9 @@ package com.cs253.appdebugger.database;
 public class Stats {
     private long id;
     private String app_name;
-    private long start_time;
-    private long end_time;
+    private long app_load_time;
     private long data_sent;
+    private long nic_load_time;
 
     public long getId() {
         return this.id;
@@ -18,26 +18,17 @@ public class Stats {
         this.id = id;
     }
 
-    public long getStartTime() {
-        return this.start_time;
+    public long getAppLoadTime() {
+        return this.app_load_time;
     }
 
-    public long getEndTime() {
-        return this.end_time;
+    public void setAppLoadTime(long start) {
+        this.app_load_time = start;
     }
 
-    public long getTotalTime() {
-        return this.end_time - this.start_time;
+    public void setNicLoadTime(long time) {
+        this.nic_load_time = time;
     }
-
-    public void setStartTime(long start) {
-        this.start_time = start;
-    }
-
-    public void setEndTime(long end) {
-        this.end_time = end;
-    }
-
     public String getPackageName() {
         return this.app_name;
     }
@@ -49,6 +40,8 @@ public class Stats {
     public void setDataSent(long data) {
         this.data_sent = data;
     }
+
+    public long getNicLoadTime() { return this.nic_load_time;}
 
     public long getDataSent() {
         return this.data_sent;
