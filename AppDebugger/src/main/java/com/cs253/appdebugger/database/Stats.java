@@ -9,17 +9,10 @@ public class Stats {
     private long app_load_time;
     private long data_sent;
     private long nic_load_time;
-
-    public long getId() {
-        return this.id;
-    }
+    private String which_nic;
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getAppLoadTime() {
-        return this.app_load_time;
     }
 
     public void setAppLoadTime(long start) {
@@ -28,9 +21,6 @@ public class Stats {
 
     public void setNicLoadTime(long time) {
         this.nic_load_time = time;
-    }
-    public String getPackageName() {
-        return this.app_name;
     }
 
     public void setPackageName(String app) {
@@ -41,10 +31,24 @@ public class Stats {
         this.data_sent = data;
     }
 
+    public void setNicType(String nic) { this.which_nic = nic; }
+
+    public String getPackageName() {
+        return this.app_name;
+    }
+
+    public long getAppLoadTime() { return this.app_load_time; }
+
+    public long getId() {
+        return this.id;
+    }
+
     public long getNicLoadTime() { return this.nic_load_time;}
 
     public long getDataSent() {
         return this.data_sent;
     }
+
+    public String getNicType() { return this.which_nic; }
 
 }

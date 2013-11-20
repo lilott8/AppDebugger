@@ -9,6 +9,7 @@ import android.net.TrafficStats;
 import android.util.Log;
 
 import com.cs253.appdebugger.App;
+import com.cs253.appdebugger.NetworkConnectivityListener;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,12 +29,14 @@ public class NetworkMonitor extends Benchmarker{
     private String whichNic;
     private long totalBytesSent;
     private Context context;
+    private NetworkConnectivityListener ncl;
 
     public NetworkMonitor(App whichApp) {
         super();
         this.app = whichApp;
         this.trafficStats = new TrafficStats();
         this.context = super.getContext();
+        this.ncl = new NetworkConnectivityListener();
         try {
             this.cm = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
             this.ni = cm.getActiveNetworkInfo();
@@ -43,11 +46,11 @@ public class NetworkMonitor extends Benchmarker{
 
         try{
             if(this.ni.getType() == ConnectivityManager.TYPE_WIFI ||
-                this.ni.getType() == ConnectivityManager.TYPE_WIMAX) {
-            this.whichNic = "WIFI";
-        } else {
-            this.whichNic = "MOBILE";
-        }
+                    this.ni.getType() == ConnectivityManager.TYPE_WIMAX) {
+                this.whichNic = "WIFI";
+            } else {
+                this.whichNic = "MOBILE";
+            }
         } catch (NullPointerException e) {
             Log.e("AppDebugger", "Could not get which nic is in use.");
         }
@@ -123,8 +126,13 @@ public class NetworkMonitor extends Benchmarker{
      * @return
      *  long of something
      */
-    public long measureNetworkState() {
-        return 0;
+    public void measureNetworkState() {
+        int i=0;
+        Log.d("AppDebugger", "starting measureNetworkState");
+       // while(this.ncl.getState() != NetworkConnectivityListener.State.CONNECTED) {
+            i++;
+        //}
+        Log.d("AppDebugger", "leaving measureNetworkState");
     }
 
     /**
@@ -141,21 +149,14 @@ public class NetworkMonitor extends Benchmarker{
         long nowTx = 0;
         long previousTx = 0;
         long deltaTx = 100;
-        // Get the tx size for our app
-        nowTx = this.getTxBytes();
-        // Start the app
-        Intent benchmarkIntent = this.context.getPackageManager().getLaunchIntentForPackage(this.app.getPackageName());
-        if(benchmarkIntent != null) {
-            super.getContext().startActivity(benchmarkIntent);
-        } else {
-            Log.e("AppDebugger", "Benchmark Intent is null!");
-        }
-        // just a small fail-safe, I know this technically adds to the loading time,
-        // but I want to rule out some silly loop problems.
-        int i = 0;
         // This is our initial data sent, this will be used to calculate our total
         // data sent for this app.
         initialTx = this.getTxBytes();
+        // Get the tx size for our app
+        nowTx = this.getTxBytes();
+        // just a small fail-safe, I know this technically adds to the loading time,
+        // but I want to rule out some silly loop problems.
+        int i = 0;
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -172,17 +173,17 @@ public class NetworkMonitor extends Benchmarker{
             } else {
                 break;
             }
-        this.totalBytesSent = Math.abs(nowTx - initialTx);
-    }
+            this.totalBytesSent = Math.abs(nowTx - initialTx);
+        }
     }
 
     public long getTotalBytesSent(){
-            return this.totalBytesSent;
+        return this.totalBytesSent;
     }
 
-
     public String getWhichNic() {
-        return this.whichNic;
+        // return this.whichNic;
+        return "nan";
     }
 
 }

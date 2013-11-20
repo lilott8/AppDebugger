@@ -19,6 +19,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String APP_LOAD_TIME = "app_load_time";
     public static final String DATA_SENT = "data_sent";
     public static final String NIC_LOAD_TIME = "nic_load_time";
+    public static final String NIC_TYPE = "nic_type";
     // Monitor columns
     public static final String TABLE_MONITOR = "monitor";
     public static final String ACTIVE = "active";
@@ -29,7 +30,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String STATS_CREATE = "create table " + TABLE_STATS + " (" +
             _ID + " integer primary key autoincrement, " +
-            APP_NAME + " varchar(255) unique not null, " +
+            APP_NAME + " varchar(255) not null, " +
+            NIC_TYPE + " varchar(255), " +
             APP_LOAD_TIME + " unsigned bigint, " +
             NIC_LOAD_TIME + " unsigned bigint, " +
             DATA_SENT + " unsigned bigint)";
@@ -48,9 +50,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        Toast.makeText(this.context, "Creating database tables now...", Toast.LENGTH_LONG).show();
-        database.execSQL(STATS_CREATE);
-        database.execSQL(MONITOR_CREATE);
+        Toast.makeText(this.context, "Finally we are installing the #$%^ing tables!", Toast.LENGTH_SHORT).show();
+            database.execSQL(STATS_CREATE);
+            Log.e("AppDebugger", "We couldn't execute: " + STATS_CREATE);
+            database.execSQL(MONITOR_CREATE);
+            Log.e("AppDebugger", "We couldn't execute: " + MONITOR_CREATE);
     }
 
     @Override
@@ -58,8 +62,19 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         Log.w(MySQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_MONITOR);
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_STATS);
-        onCreate(database);
+        try {
+            Log.d("AppDebugger", "Executing: " + "DROP TABLE IF EXISTS " + TABLE_MONITOR);
+            Log.d("AppDebugger", "Executing: " + "DROP TABLE IF EXISTS " + TABLE_STATS);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_MONITOR);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_STATS);
+        } catch (Exception e) {
+            Log.e("AppDebugger", "We couldn't execute the drop: " + e.toString());
+        }
+        this.createTables(database);
+    }
+
+    public void createTables(SQLiteDatabase database) {
+        database.execSQL(STATS_CREATE);
+        database.execSQL(MONITOR_CREATE);
     }
 }

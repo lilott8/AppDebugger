@@ -22,7 +22,7 @@ public class StatsDataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbhelper;
     private String[] allColumns = {MySQLiteHelper._ID, MySQLiteHelper.APP_NAME,
-            MySQLiteHelper.APP_LOAD_TIME, MySQLiteHelper.DATA_SENT};
+            MySQLiteHelper.APP_LOAD_TIME, MySQLiteHelper.DATA_SENT, MySQLiteHelper.NIC_TYPE};
 
     public StatsDataSource(Context context) {
         this.dbhelper = new MySQLiteHelper(context);
@@ -56,24 +56,22 @@ public class StatsDataSource {
         return stats;
     }
 
-    public Stats createStats(long app_load_time, String app_name, long data_sent, long nic_load_time) {
+    public Stats createStats(long app_load_time, String app_name, long data_sent, long nic_load_time, String nic) {
         ContentValues values = new ContentValues();
         // Get the values ready for insert
         values.put(MySQLiteHelper.APP_NAME, app_name);
+        values.put(MySQLiteHelper.NIC_TYPE, nic);
         values.put(MySQLiteHelper.APP_LOAD_TIME, app_load_time);
         values.put(MySQLiteHelper.NIC_LOAD_TIME, nic_load_time);
         values.put(MySQLiteHelper.DATA_SENT, data_sent);
         // Attempt to insert the record
         try {
-            /**
-             * Insert into stats ( app_name, start_time, end_time, data_sent) VALUES
-             * (value 1, value 2, value 3, value 4);
-             */
+            Log.d("AppDebugger", "Attempting to insert into stats");
+            // Insert into stats ( app_name, start_time, end_time, data_sent) VALUES
+            // (value 1, value 2, value 3, value 4, value 5);
             long insertId = this.database.insert(MySQLiteHelper.TABLE_STATS, null, values);
             // grab the newest record from our db
-            /**
-             * Select * from stats where _ID = insert_id from above
-             */
+            // Select * from stats where _ID = insert_id from above
             Cursor cursor = this.database.query(MySQLiteHelper.TABLE_STATS, this.allColumns,
                     MySQLiteHelper._ID + " = " + insertId, null, null, null, null);
             // We want the first returned value
@@ -91,13 +89,15 @@ public class StatsDataSource {
 
 
     public Stats cursorToStats(Cursor cursor) {
-        Log.d("AppDebugger", "The packagename should be: "+cursor.getString(1));
         Stats stats = new Stats();
-        stats.setPackageName(cursor.getString(1));
-        stats.setDataSent(cursor.getLong(4));
+        /**
         stats.setId(cursor.getLong(0));
-        stats.setAppLoadTime(cursor.getLong(2));
-        stats.setNicLoadTime(cursor.getLong(3));
-        return stats;
+        stats.setPackageName(cursor.getString(1));
+        stats.setNicType(cursor.getString(2));
+        stats.setAppLoadTime(cursor.getLong(3));
+        stats.setNicLoadTime(cursor.getLong(4));
+        stats.setDataSent(cursor.getLong(5));
+        **/
+         return stats;
     }
 }

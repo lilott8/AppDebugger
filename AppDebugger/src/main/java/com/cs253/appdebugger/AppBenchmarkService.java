@@ -69,10 +69,19 @@ public class AppBenchmarkService extends Service {
         });
         t.start();
 */
+        // Start the app
+        Intent benchmarkIntent = getPackageManager().getLaunchIntentForPackage(this.app.getPackageName());
+        if(benchmarkIntent != null) {
+            startActivity(benchmarkIntent);
+        } else {
+            Log.e("AppDebugger", "Benchmark Intent is null!");
+        }
         // get our nic state change time
         this.nicLoadTime = System.currentTimeMillis();
         this.benchmarker.nm.measureNetworkState();
         this.nicLoadTime = System.currentTimeMillis() - this.nicLoadTime;
+        Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " +
+                Long.toString(this.nicLoadTime) + " milliseconds to turn on a nic");
 
         // get our network load time!
         this.appLoadTime = System.currentTimeMillis();
@@ -86,7 +95,7 @@ public class AppBenchmarkService extends Service {
         // The totalTx will be the initial - now
         // amount of traffic sent
         Stats s = this.statsDataSource.createStats(this.appLoadTime, this.app.getPackageName(),
-                this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime);
+                this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime, this.benchmarker.nm.getWhichNic());
 
         if (s.getId() > 0) {
             Log.d("AppDebugger", "Our insert happened successfully");
@@ -169,9 +178,12 @@ public class AppBenchmarkService extends Service {
         uploader.addEntry("1981683208", Long.toString(this.nicLoadTime));
         // TotalDataSent
         uploader.addEntry("1320577572", Long.toString(this.benchmarker.nm.getTotalBytesSent()));
+        // WhichNic?
+        uploader.addEntry("1393503322", this.benchmarker.nm.getWhichNic());
         // Android Version
         uploader.addEntry("1037276429", Build.VERSION.RELEASE);
         // Upload the data
         uploader.upload();
+
     }
 }
