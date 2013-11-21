@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String ACTIVITY_NAMES = "activities";
     // Database "stuff"
     public static final String DATABASE_NAME = "appDebugger.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String STATS_CREATE = "create table " + TABLE_STATS + " (" +
             _ID + " integer primary key autoincrement, " +

@@ -47,8 +47,10 @@ public class NetworkMonitor extends Benchmarker{
         try{
             if(this.ni.getType() == ConnectivityManager.TYPE_WIFI ||
                     this.ni.getType() == ConnectivityManager.TYPE_WIMAX) {
+                Log.d("AppDebugger", "Nic Type is WIFI");
                 this.whichNic = "WIFI";
             } else {
+                Log.d("AppDebugger", "Nic Type is MOBILE");
                 this.whichNic = "MOBILE";
             }
         } catch (NullPointerException e) {
@@ -122,7 +124,7 @@ public class NetworkMonitor extends Benchmarker{
     }
 
     /**
-     *
+     *  TODO: get this working!
      * @return
      *  long of something
      */
