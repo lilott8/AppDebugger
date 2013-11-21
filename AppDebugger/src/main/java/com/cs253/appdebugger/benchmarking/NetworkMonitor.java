@@ -113,7 +113,7 @@ public class NetworkMonitor extends Benchmarker{
     public void measureNetworkState() {
         int i=0;
         Log.d("AppDebugger", "starting measureNetworkState");
-       while(!Connectivity.isConnected(this.context) || i < 100) {
+        while(!Connectivity.isConnected(this.context) || i < 100) {
             i++;
         }
         Log.d("AppDebugger", "leaving measureNetworkState");
@@ -150,10 +150,10 @@ public class NetworkMonitor extends Benchmarker{
          */
         while((Math.abs(nowTx - previousTx) > deltaTx)) {
             //if(10000 > i) {
-                previousTx = nowTx;
-                nowTx = this.getTxBytes();
-                //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
-                i++;
+            previousTx = nowTx;
+            nowTx = this.getTxBytes();
+            //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
+            i++;
             //} else {
             //    break;
             //}
@@ -167,11 +167,11 @@ public class NetworkMonitor extends Benchmarker{
 
     public String getWhichNic() {
         try {
-        if(Connectivity.isConnectedMobile(this.context)) {
-            return "MOBILE";
-        } else {
-            return "WIFI";
-        }
+            if(Connectivity.isConnectedMobile(this.context)) {
+                return "MOBILE";
+            } else {
+                return "WIFI";
+            }
         } catch(NullPointerException e) {
             Log.d("AppDebugger", "We couldn't get the nic type");
             return "nan";

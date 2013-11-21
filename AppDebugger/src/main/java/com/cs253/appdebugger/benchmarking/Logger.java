@@ -1,5 +1,6 @@
 package com.cs253.appdebugger.benchmarking;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -84,5 +85,25 @@ public class Logger {
 
     public void addApp(App a) {
         this.apps.add(a);
+    }
+
+
+    // Asynchronous task that reads the logs for a particular app
+    private class readLogsTask extends AsyncTask<Void, Void, Void> {
+        Logger logger;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            this.logger = new Logger("com.facebook.katana", "V");
+            //Toast.makeText(getApplicationContext(), "We are in the doinbackground", Toast.LENGTH_SHORT).show();
+            try
+            {
+                logger.readALog();
+            }
+            catch (Exception e)
+            {
+                //Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            return null;
+        }
     }
 }

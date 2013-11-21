@@ -6,6 +6,10 @@ import android.util.Log;
 
 import com.cs253.appdebugger.App;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 
 /**
  * Created by jason on 11/6/13.
@@ -33,3 +37,6 @@ public class Benchmarker {
         return this.context;
     }
 }
+
+
+
