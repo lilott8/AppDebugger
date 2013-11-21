@@ -3,6 +3,8 @@ package com.cs253.appdebugger;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,13 +21,20 @@ import com.cs253.appdebugger.other.ParcelableApp;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
 /**
  * Created by jason on 10/24/13.
  */
-public class AppBenchmarkService extends Service {
+public class AppBenchmarkService extends Service implements View.OnTouchListener{
 
     // Our database connections
     private StatsDataSource statsDataSource;
@@ -41,12 +50,38 @@ public class AppBenchmarkService extends Service {
     private App app;
     private long appLoadTime;
     private long nicLoadTime;
+    // window manager
+    private WindowManager mWindowManager;
+    // linear layout will use to detect touch event
+    private LinearLayout touchLayout;
+    private boolean touched;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         // Just a way to group and consolidate various actions
         this.initializeVariables();
+        // create the linearlayout
+        this.touchLayout = new LinearLayout(this);
+        // set the parameters for our layout
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(30, ViewGroup.LayoutParams.MATCH_PARENT);
+        // Just for troubleshooting
+        this.touchLayout.setBackgroundColor(Color.CYAN);
+        // set our on touch listener
+        this.touchLayout.setOnTouchListener(this);
+        // get our new windowmanager object
+        this.mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        // Create a window manager to place our new view on
+        WindowManager.LayoutParams mParams = new WindowManager.LayoutParams(30,
+                // our width variable, set our type to phone, non application windows providing user interaction
+                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.TYPE_PHONE,
+                // this window will never get focus, invisible to the user
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+        //
+        mParams.gravity = Gravity.LEFT | Gravity.TOP;
+        //  attach our layout to our window manager
+        this.mWindowManager.addView(this.touchLayout, mParams);
     }
 
     /**
@@ -64,14 +99,17 @@ public class AppBenchmarkService extends Service {
         this.app = pa.getApp();
         this.benchmarker = new Benchmarker(this.app, this);
         // Toast.makeText(this.context, "The package name is: "+this.app.getPackageName(), Toast.LENGTH_SHORT).show();
+        // We want to thread this so we don't get in trouble from android
+        // and so we don't affect the results!
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 runMeasurement();
            }
         });
+        // Start our thread
         t.start();
-
+        Log.d("AppDebugger", "Here is the context from AppBenchmarkService: "+ this.context.toString());
         return START_STICKY;
     }
 
@@ -89,6 +127,7 @@ public class AppBenchmarkService extends Service {
         // get our application context
         this.parentApp = getApplication();
         this.context = this.parentApp.getApplicationContext();
+        this.touched = false;
     }
 
     @Override
@@ -117,8 +156,14 @@ public class AppBenchmarkService extends Service {
     }
 
     public void onDestroy() {
+        if(this.mWindowManager != null) {
+            if (this.touchLayout != null) {
+                this.mWindowManager.removeView(this.touchLayout);
+            }
+        }
         // Close our data source when the service is ended
         this.statsDataSource.close();
+        super.onDestroy();
     }
 
 
@@ -165,7 +210,11 @@ public class AppBenchmarkService extends Service {
 
         // get our network load time!
         this.appLoadTime = System.currentTimeMillis();
-        this.benchmarker.nm.measureNetworkUse();
+        while(this.benchmarker.nm.getTotalBytesSent() < 1 && !this.touched) { //and no user input
+            this.benchmarker.nm.measureNetworkUse();
+        }
+        // reset our touched value
+        this.touched = false;
         this.appLoadTime = System.currentTimeMillis() - this.appLoadTime;
 
         Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " +
@@ -185,4 +234,14 @@ public class AppBenchmarkService extends Service {
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         this.postDataToForm();
     }
+
+    // https://github.com/kpbird/android-global-touchevent
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        this.touched = true;
+        if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP)
+            Log.i("AppDebugger", "Action :" + event.getAction() + "\t X :" + event.getRawX() + "\t Y :"+ event.getRawY());
+        return true;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.cs253.appdebugger.benchmarking;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.cs253.appdebugger.App;
 
@@ -24,7 +25,8 @@ public class Benchmarker {
         this.app = whichApp;
         this.context = c;
         this.logger = new Logger("V");
-        this.nm = new NetworkMonitor(this.app);
+        this.nm = new NetworkMonitor(this.app, this.context);
+        Log.d("AppDebugger", "Here is the context from Benchmarker: " + this.context.toString());
     }
 
     public Context getContext() {

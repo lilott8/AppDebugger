@@ -28,15 +28,15 @@ public class NetworkMonitor extends Benchmarker{
     private long totalBytesSent;
     private Context context;
 
-    public NetworkMonitor(App whichApp) {
+    public NetworkMonitor(App whichApp, Context c) {
         super();
         this.app = whichApp;
         this.trafficStats = new TrafficStats();
-        this.context = super.getContext();
+        this.context = c;
         try {
-            Log.d("AppDebugger", this.context.toString());
+            Log.d("AppDebugger", "Context from networkmonitor: "+this.context.toString());
         } catch(NullPointerException e) {
-            Log.d("AppDebugger", "Context is null?!");
+            Log.d("AppDebugger", "Context is null?! -- Network Monitor");
         }
     }
 
@@ -113,9 +113,9 @@ public class NetworkMonitor extends Benchmarker{
     public void measureNetworkState() {
         int i=0;
         Log.d("AppDebugger", "starting measureNetworkState");
-       //while(!Connectivity.isConnected(this.context) || i < 100) {
-       //     i++;
-       // }
+       while(!Connectivity.isConnected(this.context) || i < 100) {
+            i++;
+        }
         Log.d("AppDebugger", "leaving measureNetworkState");
     }
 
@@ -132,7 +132,7 @@ public class NetworkMonitor extends Benchmarker{
         long initialTx = 0;
         long nowTx = 0;
         long previousTx = 0;
-        long deltaTx = 100;
+        long deltaTx = 1;
         // This is our initial data sent, this will be used to calculate our total
         // data sent for this app.
         initialTx = this.getTxBytes();
@@ -148,15 +148,15 @@ public class NetworkMonitor extends Benchmarker{
          *  get new now
          * }
          */
-        while((Math.abs(nowTx - previousTx) > deltaTx) || i < 1000) {
-            if(10000 > i) {
+        while((Math.abs(nowTx - previousTx) > deltaTx)) {
+            //if(10000 > i) {
                 previousTx = nowTx;
                 nowTx = this.getTxBytes();
                 //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
                 i++;
-            } else {
-                break;
-            }
+            //} else {
+            //    break;
+            //}
             this.totalBytesSent = Math.abs(nowTx - initialTx);
         }
     }
