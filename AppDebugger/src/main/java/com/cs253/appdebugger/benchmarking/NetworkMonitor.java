@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.cs253.appdebugger.App;
 import com.cs253.appdebugger.NetworkConnectivityListener;
+import com.cs253.appdebugger.other.Connectivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,37 +25,18 @@ public class NetworkMonitor extends Benchmarker{
 
     private App app;
     private TrafficStats trafficStats;
-    private NetworkInfo ni;
-    private ConnectivityManager cm;
-    private String whichNic;
     private long totalBytesSent;
     private Context context;
-    private NetworkConnectivityListener ncl;
 
     public NetworkMonitor(App whichApp) {
         super();
         this.app = whichApp;
         this.trafficStats = new TrafficStats();
         this.context = super.getContext();
-        this.ncl = new NetworkConnectivityListener();
         try {
-            this.cm = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            this.ni = cm.getActiveNetworkInfo();
-        } catch (NullPointerException e) {
-            Log.e("AppDebugger", "We could not get the connectivity manager");
-        }
-
-        try{
-            if(this.ni.getType() == ConnectivityManager.TYPE_WIFI ||
-                    this.ni.getType() == ConnectivityManager.TYPE_WIMAX) {
-                Log.d("AppDebugger", "Nic Type is WIFI");
-                this.whichNic = "WIFI";
-            } else {
-                Log.d("AppDebugger", "Nic Type is MOBILE");
-                this.whichNic = "MOBILE";
-            }
-        } catch (NullPointerException e) {
-            Log.e("AppDebugger", "Could not get which nic is in use.");
+            Log.d("AppDebugger", this.context.toString());
+        } catch(NullPointerException e) {
+            Log.d("AppDebugger", "Context is null?!");
         }
     }
 
@@ -131,9 +113,9 @@ public class NetworkMonitor extends Benchmarker{
     public void measureNetworkState() {
         int i=0;
         Log.d("AppDebugger", "starting measureNetworkState");
-       // while(this.ncl.getState() != NetworkConnectivityListener.State.CONNECTED) {
-            i++;
-        //}
+       //while(!Connectivity.isConnected(this.context) || i < 100) {
+       //     i++;
+       // }
         Log.d("AppDebugger", "leaving measureNetworkState");
     }
 
@@ -184,8 +166,16 @@ public class NetworkMonitor extends Benchmarker{
     }
 
     public String getWhichNic() {
-        // return this.whichNic;
-        return "nan";
+        try {
+        if(Connectivity.isConnectedMobile(this.context)) {
+            return "MOBILE";
+        } else {
+            return "WIFI";
+        }
+        } catch(NullPointerException e) {
+            Log.d("AppDebugger", "We couldn't get the nic type");
+            return "nan";
+        }
     }
 
 }
