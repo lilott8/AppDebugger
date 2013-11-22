@@ -5,18 +5,18 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
-	<string name="appDetails_packageName"></string>
-	<string name="labelAppVersion">App Version:</string>
-	<string name="textViewAppVersion"></string>
-	<string name="appDetails_launch">Launch</string>
-	<string name="appDetails_debug">Debug</string>
-	<string name="labelAppName">App Name:</string>
-	<string name="textViewAppName"></string>
-	<string name="buttonLaunchApp">Launch Application</string>
-	<string name="buttonBenchmarkApp">Benchmark Application</string>
-	<string name="appDebuggerService">Hello World!</string>
-	<string name="appDebuggerMonitor"></string>
+    <string name="appDetails_packageName"></string>
+    <string name="labelAppVersion">App Version:</string>
+    <string name="textViewAppVersion"></string>
+    <string name="appDetails_launch">Launch</string>
+    <string name="appDetails_debug">Debug</string>
+    <string name="labelAppName">App Name:</string>
+    <string name="textViewAppName"></string>
+    <string name="buttonLaunchApp">Launch Application</string>
+    <string name="buttonBenchmarkApp">Benchmark Application</string>
+    <string name="appDebuggerService">Hello World!</string>
+    <string name="appDebuggerMonitor"></string>
     <string name="labelAppUID">AppUID:</string>
     <string name="textVivewAppUID"></string>
-
+    <string name="textViewBenchmarkApp"></string>
 </resources>

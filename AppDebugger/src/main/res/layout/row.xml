@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
-			  android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:id="@+id/appslist"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,30 +14,95 @@
         android:layout_marginRight="6dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
+        android:orientation="vertical"
         android:background="@drawable/card_background">
 
 
-        <ImageView
-            android:id="@+id/appicon"
-            android:scaleType="fitStart"
-            android:layout_width="@dimen/image_width"
-            android:layout_height="@dimen/image_height"
-            android:layout_marginRight="6dip"
-            android:layout_marginTop="2dip"
-            android:layout_marginBottom="2dip"
-            android:layout_marginLeft="2dip"
-            android:src="@drawable/icon"
-            android:layout_gravity="left" />
+            <ImageView
+                android:id="@+id/appicon"
+                android:scaleType="fitStart"
+                android:layout_width="@dimen/image_width"
+                android:layout_height="@dimen/image_height"
+                android:layout_marginRight="6dip"
+                android:layout_marginTop="2dip"
+                android:layout_marginBottom="2dip"
+                android:layout_marginLeft="2dip"
+                android:src="@drawable/icon"
+                android:layout_gravity="left"
+                android:paddingBottom="@dimen/rowPaddingXSmall"/>
 
-        <TextView
-            android:layout_gravity="left|center_vertical"
+            <TextView
+                android:layout_gravity="left|center_vertical"
+                android:layout_width="fill_parent"
+                android:layout_weight="1"
+                android:textColor="@android:color/primary_text_light"
+                android:id="@+id/apptitle"
+                android:textSize="@dimen/fontLarge"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/rowPadding"
+                />
+
+
+
+        <View
             android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:textColor="@android:color/primary_text_light"
-            android:id="@+id/apptitle"
-            android:textSize="@dimen/body_text_size"
-            android:layout_height="wrap_content" />
+            android:layout_height="1dp"
+            android:background="@color/highlightColor"/>
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        >
+
+        <ImageView
+            android:scaleType="fitStart"
+            android:layout_width="@dimen/image_arrow_width"
+            android:layout_height="@dimen/image_arrow_height"
+            android:src="@drawable/ic_send_holo_light_xxhdpi"
+            android:gravity="left|center_vertical"/>
+        <TextView
+            android:layout_gravity="bottom|center_vertical"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:id="@+id/appbenchmark"
+            android:textSize="@dimen/fontMedium"
+            android:paddingTop="@dimen/rowPaddingSmall"
+            android:paddingBottom="@dimen/rowPaddingSmall"
+            android:gravity="left|center_vertical"
+            />
 </LinearLayout>
+
+
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/highlightColor"/>
+
+
+
+
+        <ImageView
+            android:scaleType="fitStart"
+            android:layout_width="@dimen/image_arrow_width"
+            android:layout_height="@dimen/image_arrow_height"
+            android:src="@drawable/ic_send_holo_light_xxhdpi"
+            android:gravity="left|center_vertical"/>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/appresults"
+            android:textSize="@dimen/fontMedium"
+            android:paddingTop="@dimen/rowPaddingSmall"
+            android:paddingBottom="@dimen/rowPaddingSmall"
+            android:layout_gravity="left|center_vertical"
+            />
+
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>

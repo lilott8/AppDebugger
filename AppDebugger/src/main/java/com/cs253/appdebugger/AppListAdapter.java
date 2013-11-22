@@ -2,18 +2,24 @@ package com.cs253.appdebugger;
 
 import com.cs253.appdebugger.AppListAdapter;
 import com.cs253.appdebugger.App;
+import com.cs253.appdebugger.other.ParcelableApp;
 
 import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.view.View.OnClickListener;
 
 /**
  * A custom list adapter which holds a reference to all installed apps and displays their respective title
@@ -43,6 +49,8 @@ public class AppListAdapter extends BaseAdapter {
     /** a map which maps the package name of an app to its icon drawable */
     private Map<String, Drawable> mIcons;
     private Drawable mStdImg;
+    private Context context;
+    private App app;
 
     /**
      * Constructor.
@@ -55,6 +63,30 @@ public class AppListAdapter extends BaseAdapter {
 
         // set the default icon until the actual icon is loaded for an app
         mStdImg = context.getResources().getDrawable(R.drawable.icon);
+        this.context = context;
+    }
+
+    public void benchmarkApp() {
+        ParcelableApp pa = new ParcelableApp(this.app);
+        // Initialize an intent to our service that will monitor for stats gathering
+        Intent intent = new Intent(this.context.getApplicationContext(), AppBenchmarkService.class);
+        // Put our app name in our intent so we have access to it in our service
+        intent.putExtra("app", pa);
+        // start our service
+        this.context.startService(intent);
+    }
+
+    public void checkResults() {
+        // Create a parcelable app
+        ParcelableApp pa = new ParcelableApp(this.app);
+        // Create a new intent for our new activity
+        Intent intent = new Intent(this.context.getApplicationContext(), AppDetails.class);
+        // pass the parcelable to our intent
+        intent.putExtra("app", pa);
+        // This is needed to start our activity from outside an activity
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // start the activity
+        this.context.startActivity(intent);
     }
 
     @Override
@@ -76,6 +108,7 @@ public class AppListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         AppViewHolder holder;
+
         if(convertView == null) {
             convertView = mInflater.inflate(R.layout.row, null);
 
@@ -83,19 +116,37 @@ public class AppListAdapter extends BaseAdapter {
             holder = new AppViewHolder();
             holder.mTitle = (TextView) convertView.findViewById(R.id.apptitle);
             holder.mIcon = (ImageView) convertView.findViewById(R.id.appicon);
+
+            // Set our benchmarker and add an onClickListener to this view
+            holder.mBenchmark = (TextView) convertView.findViewById(R.id.appbenchmark);
+            holder.mBenchmark.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    benchmarkApp();
+                }
+            });
+
+            // Set our results and add an onClickListener to this view
+            holder.mResults = (TextView) convertView.findViewById(R.id.appresults);
+            holder.mResults.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    checkResults();
+                }
+            });
             convertView.setTag(holder);
         } else {
             // reuse/overwrite the view passed assuming(!) that it is castable!
             holder = (AppViewHolder) convertView.getTag();
         }
 
-        App app = mApps.get(position);
-
-        holder.setTitle(app.getTitle());
-        if (mIcons == null || mIcons.get(app.getPackageName()) == null) {
+        holder.setTitle(this.app.getTitle());
+        holder.setBenchmark("Benchmark " + this.app.getTitle());
+        holder.setResults("See Results for " + this.app.getTitle());
+        if (mIcons == null || mIcons.get(this.app.getPackageName()) == null) {
             holder.setIcon(mStdImg);
         } else {
-            holder.setIcon(mIcons.get(app.getPackageName()));
+            holder.setIcon(mIcons.get(this.app.getPackageName()));
         }
 
         return convertView;
@@ -135,6 +186,8 @@ public class AppListAdapter extends BaseAdapter {
 
         private TextView mTitle;
         private ImageView mIcon;
+        private TextView mBenchmark;
+        private TextView mResults;
 
         /**
          * Sets the text to be shown as the app's title
@@ -154,6 +207,14 @@ public class AppListAdapter extends BaseAdapter {
             if (img != null) {
                 mIcon.setImageDrawable(img);
             }
+        }
+
+        public void setBenchmark(String s) {
+            mBenchmark.setText(s);
+        }
+
+        public void setResults(String s) {
+            mResults.setText(s);
         }
     }
 }

@@ -95,42 +95,6 @@ public class ListApps extends Activity implements OnItemClickListener {
 
         intent.putExtra("packageName", app.getPackageName());
         startActivity(intent);
-/*
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        String msg = app.getTitle() + "\n\n" +
-                "Version " + app.getVersionName() + " (" +
-                app.getVersionCode() + ")" +
-                (app.getDescription() != null ? ("\n\n" + app.getDescription()) : "");
-
-        builder.setMessage(msg)
-                .setCancelable(true)
-                .setTitle(app.getTitle())
-                .setIcon(mAdapter.getIcons().get(app.getPackageName()))
-                .setPositiveButton("Launch", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // start the app by invoking its launch intent
-                        Intent i = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
-                        try {
-                            if (i != null) {
-                                startActivity(i);
-                            } else {
-                                i = new Intent(app.getPackageName());
-                                startActivity(i);
-                            }
-                        } catch (ActivityNotFoundException err) {
-                            Toast.makeText(ListApps.this, "Error launching app", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        */
     }
 
     /**

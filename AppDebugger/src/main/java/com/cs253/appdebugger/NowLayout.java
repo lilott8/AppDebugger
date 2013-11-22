@@ -47,7 +47,7 @@ public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
             if (location[1] > heightPx) {
                 break;
             }
-
+/*
             if (!inversed) {
                 child.startAnimation(AnimationUtils.loadAnimation(getContext(),
                         R.anim.slide_up_left));
@@ -55,7 +55,7 @@ public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
                 child.startAnimation(AnimationUtils.loadAnimation(getContext(),
                         R.anim.slide_up_right));
             }
-
+*/
             inversed = !inversed;
         }
 

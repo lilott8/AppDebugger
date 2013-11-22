@@ -4,6 +4,15 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="image_width">48dp</dimen>
 	<dimen name="image_height">48dp</dimen>
+    <dimen name="image_arrow_width">18dp</dimen>
+    <dimen name="image_arrow_height">18dp</dimen>
 	<dimen name="body_text_size">16dp</dimen>
+    <dimen name="rowPadding">16dp</dimen>
+    <dimen name="rowPaddingSmall">8dp</dimen>
+    <dimen name="rowPaddingXSmall">4dp</dimen>
+    <dimen name="fontLarge">22sp</dimen>
+    <dimen name="fontMedium">18sp</dimen>
+    <dimen name="fontSmall">14sp</dimen>
+    <dimen name="fontMicro">12sp</dimen>
 
     </resources>
