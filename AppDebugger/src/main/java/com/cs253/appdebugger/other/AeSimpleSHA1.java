@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by jason on 11/21/13.
+ * http://stackoverflow.com/questions/5980658/how-to-sha1-hash-a-string-in-android
  */
 public class AeSimpleSHA1 {
     private static String convertToHex(byte[] data) {

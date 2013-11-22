@@ -52,7 +52,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
     private long appLoadTime;
     private long nicLoadTime;
     // window manager
-    private WindowManager mWindowManager;
+    private WindowManager mWindowManagerLeft;
+    private WindowManager mWindowManagerRight;
     // linear layout will use to detect touch event
     private LinearLayout touchLayoutLeft;
     private LinearLayout touchLayoutRight;
@@ -80,7 +81,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         this.touchLayoutLeft.setOnTouchListener(this);
         this.touchLayoutRight.setOnTouchListener(this);
         // get our new windowmanager object
-        this.mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        this.mWindowManagerLeft = (WindowManager) getSystemService(WINDOW_SERVICE);
+        this.mWindowManagerRight = (WindowManager) getSystemService(WINDOW_SERVICE);
         // Create a window manager to place our new view on
         WindowManager.LayoutParams mParamsLeft = new WindowManager.LayoutParams(30,
                 // our width variable, set our type to phone, non application windows providing user interaction
@@ -98,8 +100,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         mParamsLeft.gravity = Gravity.LEFT | Gravity.TOP;
         mParamsRight.gravity = Gravity.RIGHT | Gravity.TOP;
         //  attach our layout to our window manager
-        this.mWindowManager.addView(this.touchLayoutLeft, mParamsLeft);
-        this.mWindowManager.addView(this.touchLayoutRight, mParamsRight);
+        this.mWindowManagerLeft.addView(this.touchLayoutLeft, mParamsLeft);
+        this.mWindowManagerRight.addView(this.touchLayoutRight, mParamsRight);
     }
 
     /**
@@ -156,10 +158,14 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
     }
 
     public void onDestroy() {
-        if(this.mWindowManager != null) {
-            if (this.touchLayoutLeft != null && this.touchLayoutRight != null) {
-                this.mWindowManager.removeView(this.touchLayoutLeft);
-                this.mWindowManager.removeView(this.touchLayoutRight);
+        if(this.mWindowManagerLeft != null) {
+            if (this.touchLayoutLeft != null) {
+                this.mWindowManagerLeft.removeView(this.touchLayoutLeft);
+            }
+        }
+        if(this.mWindowManagerRight != null) {
+            if(this.touchLayoutRight != null) {
+                this.mWindowManagerRight.removeView(this.touchLayoutRight);
             }
         }
         // Close our data source when the service is ended
