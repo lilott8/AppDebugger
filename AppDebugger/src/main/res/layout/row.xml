@@ -41,6 +41,14 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/rowPadding"
                 />
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/appDebuggerMonitor"
+            android:id="@+id/checkboxAppDebug"
+            android:clickable="true"
+            android:onClick="monitorApp"
+            android:textSize="@dimen/fontSmall"/>
 
 
 
@@ -49,11 +57,6 @@
             android:layout_height="1dp"
             android:background="@color/highlightColor"/>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        >
 
         <ImageView
             android:scaleType="fitStart"
@@ -71,13 +74,8 @@
             android:paddingBottom="@dimen/rowPaddingSmall"
             android:gravity="left|center_vertical"
             />
-</LinearLayout>
 
 
-        <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
@@ -103,6 +101,5 @@
             />
 
         </LinearLayout>
-    </LinearLayout>
 
 </FrameLayout>

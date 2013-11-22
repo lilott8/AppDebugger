@@ -4,20 +4,13 @@ import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.MonitorDataSource;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.app.Activity;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.Toast;
-
-import java.io.Serializable;
 import java.util.List;
-
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.CheckBox;
@@ -28,8 +21,6 @@ import com.cs253.appdebugger.other.ParcelableApp;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
-
-import org.json.JSONObject;
 
 /**
  * Created by jason on 10/22/13.
@@ -66,10 +57,9 @@ public class AppDetails extends Activity implements OnClickListener {
         this.mds = new MonitorDataSource(this);
         this.mds.open();
 
-        // Set up our packageManager, this will give us access to
-        // query the packages and grab the necessary data
-        initializePackageManager();
-        initializeSelectedApplication();
+        // Grab our app from our intent
+        ParcelableApp pa = this.extras.getParcelable("app");
+        this.app = pa.getApp();
 
         // Initialize our monitor, so we know what the status of this app is
         this.monitor = this.mds.selectMonitorByAppName(this.app.getPackageName());
@@ -101,62 +91,8 @@ public class AppDetails extends Activity implements OnClickListener {
         //checkForOtherActivities();
     }
 
-    private void initializeSelectedApplication() {
-        try {
-            // get our package that the user selected
-            this.packageName = this.extras.getString("packageName");
-            try {
-                // Let's create a new app object
-                this.app = new App();
-                // Get the application info from our package manager
-                ApplicationInfo ai = this.packageManager.getApplicationInfo(this.packageName, PackageManager.GET_META_DATA);
-                // Get the package info from our package manager
-                PackageInfo pi = this.packageManager.getPackageInfo(this.packageName, 0);
-
-                this.app.setPackageName(pi.packageName);
-                if(this.app.getPackageName().length() < 1) {
-                    this.app.setPackageName(pi.applicationInfo.name);
-                }
-                //this.app.setTitle(a.loadLabel(this.packageManager).toString());
-                this.app.setVersionName(pi.versionName);
-                this.app.setVersionCode(pi.versionCode);
-                // Toast.makeText(this.context, String.valueOf(ai.uid), Toast.LENGTH_SHORT).show();
-                this.app.setUid(ai.uid);
-                //this.app.setTitle(a.applicationInfo.)
-
-                CharSequence label = ai.loadLabel(this.packageManager);
-                this.app.setLabel(label != null ? label.toString() : "No label provided");
-
-                CharSequence description = ai.loadDescription(this.packageManager);
-                this.app.setDescription(description != null ? description.toString() : "No description available");
-
-                // this.packageManager.getApplicationInfo(this.packageName, PackageManager.GET_META_DATA);
-                // setAppName(this.app.packageName);
-                // setAppVersion(this.app.targetSdkVersion);
-            } catch(NameNotFoundException e) {
-                Log.e("ERROR", "AppDebugger: "+e.toString());
-            }
-        } catch(NullPointerException e) {
-            Log.e("ERROR", "AppDebugger: "+e.toString());
-        }
-    }
-
-    protected void initializePackageManager() {
-        // Load the packagemanager this has all our installed apps
-        this.packageManager = getPackageManager();
-
-        // Load our packageManager
-        try {
-            this.packs = this.packageManager.getInstalledPackages(0);
-        } catch (Exception e) {
-            Log.e("ERROR", "PackageManager could not get installed packages on line: " + e.toString());
-        }
-    }
-
     /**
-     * BenchmarkApp works through 10 Steps, in which the first and last steps of the
-     * process are completed here.  The steps are starting the service and killing the
-     * service.
+     * Start our service that will benchmark our app
      */
     public void benchmarkApp(View v) {
         ParcelableApp pa = new ParcelableApp(this.app);
@@ -166,23 +102,6 @@ public class AppDetails extends Activity implements OnClickListener {
         intent.putExtra("app", pa);
         // start our service
         this.context.startService(intent);
-        /*
-        // Toast.makeText(this.appContext, "We will be debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long txData;
-        if((txData = this.benchmarker.trafficMonitor.getTxBytes()) <= 0) {
-            txData = this.benchmarker.trafficMonitor.getTxBytesManual();
-        }
-        Log.d("AppDebugger", "Traffic transmitted at this epoch: " + Long.toString(txData));
-        */
-    }
-
-    /**
-     * Launch our App with no debugging...
-     */
-    public void launchApp(View v) {
-        Toast.makeText(this.context, "This is disabled for now", Toast.LENGTH_SHORT).show();
-        // Intent intent = this.packageManager.getLaunchIntentForPackage(this.app.getPackageName());
-        // startActivity(intent);
     }
 
     /**

@@ -1,12 +1,8 @@
 package com.cs253.appdebugger;
 
-import com.cs253.appdebugger.AppListAdapter;
-import com.cs253.appdebugger.App;
 import com.cs253.appdebugger.other.ParcelableApp;
-
 import java.util.List;
 import java.util.Map;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -14,11 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.view.View.OnClickListener;
 
 /**
@@ -66,17 +60,17 @@ public class AppListAdapter extends BaseAdapter {
         this.context = context;
     }
 
-    public void benchmarkApp(int i) {
+    public void startBenchmarkService(int i) {
         ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Initialize an intent to our service that will monitor for stats gathering
         Intent intent = new Intent(this.context.getApplicationContext(), AppBenchmarkService.class);
         // Put our app name in our intent so we have access to it in our service
         intent.putExtra("app", pa);
         // start our service
-        //this.context.startService(intent);
+        this.context.startService(intent);
     }
 
-    public void checkResults(int i) {
+    public void startResultsActivity(int i) {
         // Create a parcelable app
         ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Create a new intent for our new activity
@@ -123,7 +117,8 @@ public class AppListAdapter extends BaseAdapter {
             holder.mBenchmark.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View v) {
-                    benchmarkApp(this.position);
+                    Log.d("AppDebugger", "We clicked for benchmarks: " + this.position);
+                    startBenchmarkService(this.position);
                 }
             });
 
@@ -132,7 +127,8 @@ public class AppListAdapter extends BaseAdapter {
             holder.mResults.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View view) {
-                    checkResults(this.position);
+                    Log.d("AppDebugger", "We clicked for results: " + this.position);
+                    startResultsActivity(this.position);
                 }
             });
             convertView.setTag(holder);
@@ -219,6 +215,10 @@ public class AppListAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Our custom onClickListener so we can send different
+     *  parameters to our methods
+     */
     public class AppOnClickListener implements OnClickListener
     {
         int position;
@@ -229,7 +229,7 @@ public class AppListAdapter extends BaseAdapter {
         @Override
         public void onClick(View v)
         {
-
+            Log.d("AppDebugger", "We clicked");
         }
 
     };

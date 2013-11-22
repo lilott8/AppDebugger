@@ -5,17 +5,14 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 
 import com.cs253.appdebugger.GoogleFormUploader.GoogleFormUploader;
 import com.cs253.appdebugger.benchmarking.Benchmarker;
-import com.cs253.appdebugger.benchmarking.NetworkMonitor;
 import com.cs253.appdebugger.database.Stats;
 import com.cs253.appdebugger.database.StatsDataSource;
-import com.cs253.appdebugger.benchmarking.Logger;
 import com.cs253.appdebugger.other.AeSimpleSHA1;
 import com.cs253.appdebugger.other.ParcelableApp;
 
@@ -28,9 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import java.util.Arrays;
 
 /**
  * Created by jason on 10/24/13.

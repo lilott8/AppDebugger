@@ -1,8 +1,5 @@
 package com.cs253.appdebugger;
 
-import com.cs253.appdebugger.AppListAdapter;
-import com.cs253.appdebugger.App;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +18,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.content.Context;
 
