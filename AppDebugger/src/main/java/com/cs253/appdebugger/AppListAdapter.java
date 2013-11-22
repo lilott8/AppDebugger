@@ -66,19 +66,19 @@ public class AppListAdapter extends BaseAdapter {
         this.context = context;
     }
 
-    public void benchmarkApp() {
-        ParcelableApp pa = new ParcelableApp(this.app);
+    public void benchmarkApp(int i) {
+        ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Initialize an intent to our service that will monitor for stats gathering
         Intent intent = new Intent(this.context.getApplicationContext(), AppBenchmarkService.class);
         // Put our app name in our intent so we have access to it in our service
         intent.putExtra("app", pa);
         // start our service
-        this.context.startService(intent);
+        //this.context.startService(intent);
     }
 
-    public void checkResults() {
+    public void checkResults(int i) {
         // Create a parcelable app
-        ParcelableApp pa = new ParcelableApp(this.app);
+        ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Create a new intent for our new activity
         Intent intent = new Intent(this.context.getApplicationContext(), AppDetails.class);
         // pass the parcelable to our intent
@@ -108,6 +108,7 @@ public class AppListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         AppViewHolder holder;
+        this.app = mApps.get(position);
 
         if(convertView == null) {
             convertView = mInflater.inflate(R.layout.row, null);
@@ -119,19 +120,19 @@ public class AppListAdapter extends BaseAdapter {
 
             // Set our benchmarker and add an onClickListener to this view
             holder.mBenchmark = (TextView) convertView.findViewById(R.id.appbenchmark);
-            holder.mBenchmark.setOnClickListener(new View.OnClickListener() {
+            holder.mBenchmark.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View v) {
-                    benchmarkApp();
+                    benchmarkApp(this.position);
                 }
             });
 
             // Set our results and add an onClickListener to this view
             holder.mResults = (TextView) convertView.findViewById(R.id.appresults);
-            holder.mResults.setOnClickListener(new View.OnClickListener() {
+            holder.mResults.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View view) {
-                    checkResults();
+                    checkResults(this.position);
                 }
             });
             convertView.setTag(holder);
@@ -217,4 +218,19 @@ public class AppListAdapter extends BaseAdapter {
             mResults.setText(s);
         }
     }
+
+    public class AppOnClickListener implements OnClickListener
+    {
+        int position;
+        public AppOnClickListener(int i) {
+            this.position = i;
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+
+        }
+
+    };
 }
