@@ -80,6 +80,7 @@ public class AppDetails extends Activity {
 
         /**https://github.com/jjoe64/GraphView**/
         // init example series data
+        /*
         GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
                 new GraphView.GraphViewData(1, 2.0d)
                 , new GraphView.GraphViewData(2, 1.5d)
@@ -95,7 +96,7 @@ public class AppDetails extends Activity {
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.grapher);
         layout.addView(graphView);
-
+*/
 
         /** Deprecated for now **/
         /*
