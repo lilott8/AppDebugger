@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import java.util.List;
 import android.content.pm.PackageManager;
@@ -18,6 +19,9 @@ import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
 import com.cs253.appdebugger.other.ParcelableApp;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -25,7 +29,7 @@ import android.app.ActivityManager;
 /**
  * Created by jason on 10/22/13.
  */
-public class AppDetails extends Activity implements OnClickListener {
+public class AppDetails extends Activity {
 
     App app;
     String packageName;
@@ -73,51 +77,50 @@ public class AppDetails extends Activity implements OnClickListener {
         this.tvAppName = (TextView) findViewById(R.id.textViewAppName);
         this.tvAppUid = (TextView) findViewById(R.id.textViewAppUid);
         this.tvAppVersion = (TextView) findViewById(R.id.textViewAppVersion);
+
+        /**https://github.com/jjoe64/GraphView**/
+        // init example series data
+        GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
+                new GraphView.GraphViewData(1, 2.0d)
+                , new GraphView.GraphViewData(2, 1.5d)
+                , new GraphView.GraphViewData(3, 2.5d)
+                , new GraphView.GraphViewData(4, 1.0d)
+        });
+
+        GraphView graphView = new LineGraphView(
+                this // context
+                , "GraphViewDemo" // heading
+        );
+        graphView.addSeries(exampleSeries); // data
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.grapher);
+        layout.addView(graphView);
+
+
+        /** Deprecated for now **/
+        /*
         this.cbMonitorApp = (CheckBox) findViewById(R.id.checkboxAppDebug);
         // Initiate the onclicklistener for our checkbox
         this.cbMonitorApp.setOnClickListener(this);
         // Set our check box based on the active flag
         this.cbMonitorApp.setChecked(this.active);
-
-        // Log.d("AppDebugger", "Uid is: " + Integer.toString(this.app.getUid()));
-        // Toast.makeText(this.context, "PackageName: " + this.app.getPackageName(), Toast.LENGTH_SHORT).show();
+        */
+        /** end deprecation **/
 
         // Add to those views what we need
         this.tvAppVersion.setText(Integer.toString(this.app.getUid()));
         this.tvAppName.setText(this.app.getLabel());
         this.tvAppVersion.setText(Integer.toString(this.app.getVersionCode()));
-        this.cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
-        //Toast.makeText(this.appContext, this.getAppName(), Toast.LENGTH_LONG).show();
+        // this.cbMonitorApp.setText("Turn debugging on for: " + this.app.getLabel() + "?");
         //checkForOtherActivities();
     }
 
     /**
-     * Start our service that will benchmark our app
-     */
-    public void benchmarkApp(View v) {
-        ParcelableApp pa = new ParcelableApp(this.app);
-        // Initialize an intent to our service that will monitor for stats gathering
-        Intent intent = new Intent(getApplicationContext(), AppBenchmarkService.class);
-        // Put our app name in our intent so we have access to it in our service
-        intent.putExtra("app", pa);
-        // start our service
-        this.context.startService(intent);
-    }
-
-    /**
-     * This is what requires the most work. So put cool code here!
+     * Deprecated for now
      * @param v
+     * We must implement OnClickListener if we want to use this!
      */
-    public void monitorApp(View v) {
-        Toast.makeText(getApplicationContext(), "Debugging: " + this.app.getLabel(), Toast.LENGTH_LONG).show();
-        long data = this.benchmarker.nm.getTxBytes();
-        Toast.makeText(getApplicationContext(), "Hey, working?" + String.valueOf(data), Toast.LENGTH_SHORT).show();
-
-        //TODO: parse logcat for specific app
-        //TODO: collect network traffic for specific app
-        //TODO: get application activities for specific app
-    }
-
+    /*
     public void onClick(View v) {
         CheckBox checkBox = (CheckBox) v;
         Monitor m = this.mds.selectMonitorByAppName(this.getPackageName());
@@ -132,27 +135,7 @@ public class AppDetails extends Activity implements OnClickListener {
             }
         }
     }
-
-    public void checkForOtherActivities() {
-        ActivityManager am = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
-        List<RunningTaskInfo> a = am.getRunningTasks(Integer.MAX_VALUE);
-
-        for(int i=0;i<a.size();i++){
-
-            String packageName = a.get(i).topActivity.getPackageName();
-            try {
-            //String appName = (String) this.packageManager.getApplicationLabel(this.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
-            Log.d("Executed app", "Application executed : " +a.get(i).baseActivity.toShortString()+ "\t\t ID: "+a.get(i).id+"");
-            } catch (NullPointerException e) {
-
-            }
-            //Drawable d=pack.getApplicationIcon(packageName);
-
-            Log.v("details"," "+packageName+" "+appName);
-
-        }
-
-    }
+*/
 
     public void onDestroy() {
         super.onDestroy();

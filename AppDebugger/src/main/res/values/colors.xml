@@ -2,5 +2,6 @@
 <resources>
     <color name="baseColor">#AA66CC</color>
     <color name="highlightColor">#9933CC</color>
+    <color name="drearyGrey">#B3B3B3</color>
 
 </resources>

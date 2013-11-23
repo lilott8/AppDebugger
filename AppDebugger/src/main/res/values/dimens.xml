@@ -7,7 +7,8 @@
     <dimen name="image_arrow_width">18dp</dimen>
     <dimen name="image_arrow_height">18dp</dimen>
 	<dimen name="body_text_size">16dp</dimen>
-    <dimen name="rowPadding">16dp</dimen>
+    <dimen name="rowPaddingLarge">16dp</dimen>
+    <dimen name="rowPaddingMedium">12dp</dimen>
     <dimen name="rowPaddingSmall">8dp</dimen>
     <dimen name="rowPaddingXSmall">4dp</dimen>
     <dimen name="fontLarge">22sp</dimen>

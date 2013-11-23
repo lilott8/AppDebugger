@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -14,7 +15,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -41,6 +45,7 @@ import android.content.Context;
  *
  * @author Manuel Schwarz (m.schwarz[at]impressive-artworx.de)
  */
+//extend ActionBarActivity to get the actionbar!
 public class ListApps extends Activity implements OnItemClickListener {
 
     /* whether or not to include system apps */
@@ -63,7 +68,7 @@ public class ListApps extends Activity implements OnItemClickListener {
         // Inflate our listview view
         mAppsList = (ListView) findViewById(R.id.appslist);
         // add a listener to this view
-        mAppsList.setOnItemClickListener(this);
+        //mAppsList.setOnItemClickListener(this);
 
         // Get the apps that are on the system
         mApps = loadInstalledApps(INCLUDE_SYSTEM_APPS);
@@ -160,5 +165,13 @@ public class ListApps extends Activity implements OnItemClickListener {
         protected void onPostExecute(Void result) {
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }

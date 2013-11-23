@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
@@ -117,7 +118,6 @@ public class AppListAdapter extends BaseAdapter {
             holder.mBenchmark.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View v) {
-                    Log.d("AppDebugger", "We clicked for benchmarks: " + this.position);
                     startBenchmarkService(this.position);
                 }
             });
@@ -127,7 +127,6 @@ public class AppListAdapter extends BaseAdapter {
             holder.mResults.setOnClickListener(new AppOnClickListener(position) {
                 @Override
                 public void onClick(View view) {
-                    Log.d("AppDebugger", "We clicked for results: " + this.position);
                     startResultsActivity(this.position);
                 }
             });
@@ -139,7 +138,7 @@ public class AppListAdapter extends BaseAdapter {
 
         holder.setTitle(this.app.getTitle());
         holder.setBenchmark("Benchmark " + this.app.getTitle());
-        holder.setResults("See Results for " + this.app.getTitle());
+        holder.setResults("Results for " + this.app.getTitle());
         if (mIcons == null || mIcons.get(this.app.getPackageName()) == null) {
             holder.setIcon(mStdImg);
         } else {
@@ -185,6 +184,7 @@ public class AppListAdapter extends BaseAdapter {
         private ImageView mIcon;
         private TextView mBenchmark;
         private TextView mResults;
+        private CheckBox mCheckbox;
 
         /**
          * Sets the text to be shown as the app's title
@@ -206,12 +206,30 @@ public class AppListAdapter extends BaseAdapter {
             }
         }
 
+        /**
+         * Sets the benchmark text that links an app to starting
+         * a service to benchmark it
+         * @param s the string to be displayed
+         */
         public void setBenchmark(String s) {
             mBenchmark.setText(s);
         }
 
+        /**
+         * Sets the results text that links an app to starting
+         * the activity that shows results
+         * @param s the string to be displayed
+         */
         public void setResults(String s) {
             mResults.setText(s);
+        }
+
+        /**
+         * A full checkbox object that allows us to monitor an app
+         * @param c
+         */
+        public void setCheckbox(CheckBox c) {
+            mCheckbox = c;
         }
     }
 
