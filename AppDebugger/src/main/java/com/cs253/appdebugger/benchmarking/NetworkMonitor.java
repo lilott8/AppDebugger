@@ -44,7 +44,8 @@ public class NetworkMonitor extends Benchmarker{
      */
     public long getTxBytes() {
         long bytes = 0;
-
+        return TrafficStats.getTotalTxBytes();
+        /*
         if((bytes = TrafficStats.getUidTxBytes(this.app.getUid())) < 1) {
             bytes = this.getTxBytesManual();
         }
@@ -53,6 +54,19 @@ public class NetworkMonitor extends Benchmarker{
             Log.d("AppDebugger", "We are grabbing total phone tx bytes");
         }
         return bytes;
+        */
+    }
+
+    public long bytesTransmitted(int i) {
+        switch(i) {
+            case 1:
+                return TrafficStats.getTotalTxBytes();
+            case 2:
+                return getTxBytesManual();
+            case 3:
+                return TrafficStats.getUidTxBytes(this.app.getUid());
+        }
+        return 0L;
     }
 
     private Long getTxBytesManual(){
@@ -110,10 +124,10 @@ public class NetworkMonitor extends Benchmarker{
      *  long of something
      */
     public void measureNetworkState() {
-        int i=0;
         while(!Connectivity.isConnected(this.context)) {
+            // empty loop to calculate the time it takes to turn
+            // the NIC from a SLEEP state to an ON state
         }
-        Log.d("AppDebugger", "leaving measureNetworkState");
     }
 
     /**
@@ -121,23 +135,22 @@ public class NetworkMonitor extends Benchmarker{
      * @return
      *  long of bytes used
      */
-    public void measureNetworkUse() {
+    public long measureNetworkUse() {
         // These four longs will help us determine
         // the loading of an app.  When the size
         // between nowTx and PreviousTx are less
         // than delta, our app is "done" loading
-        long initialTx = 0;
-        long nowTx = 0;
         long previousTx = 0;
-        long deltaTx = 1;
+        long deltaTx = 0;
         // This is our initial data sent, this will be used to calculate our total
+        long initialTx = this.getTxBytes();
         // data sent for this app.
-        initialTx = this.getTxBytes();
         // Get the tx size for our app
-        nowTx = this.getTxBytes();
+        long nowTx = this.getTxBytes();
         // just a small fail-safe, I know this technically adds to the loading time,
         // but I want to rule out some silly loop problems.
-        int i = 0;
+        int seconds = 5;
+        Log.d("AppDebugger", "Initial Bytes:" + initialTx);
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -145,17 +158,21 @@ public class NetworkMonitor extends Benchmarker{
          *  get new now
          * }
          */
-        while((Math.abs(nowTx - previousTx) > deltaTx)) {
-            //if(10000 > i) {
-            previousTx = nowTx;
-            nowTx = this.getTxBytes();
-            //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
-            //i++;
-            //} else {
-            //    break;
-            //}
-            this.totalBytesSent = Math.abs(nowTx - initialTx);
+        while((Math.abs(nowTx - previousTx) > deltaTx) || seconds > 0) {
+            try {
+                nowTx = this.getTxBytes();
+                previousTx = nowTx;
+                Thread.sleep(1000);
+                seconds--;
+            } catch (Exception e) {
+                seconds--;
+            }
+            Log.d("AppDebugger", "==================================================");
+            Log.d("AppDebugger", "Total bytes are: " + nowTx);
+            Log.d("AppDebugger", "==================================================");
         }
+        this.totalBytesSent = Math.abs(nowTx - initialTx);
+        return 1000*seconds;
     }
 
     public long getTotalBytesSent(){
