@@ -18,10 +18,11 @@ import android.widget.CheckBox;
 import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
+import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.other.ParcelableApp;
-//import com.jjoe64.graphview.GraphView;
-//import com.jjoe64.graphview.GraphViewSeries;
-//import com.jjoe64.graphview.LineGraphView;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -37,7 +38,6 @@ public class AppDetails extends Activity {
     PackageManager packageManager;
     Monitor monitor;
     String appName;
-    int appVersion;
     boolean active;
     TextView tvAppName;
     TextView tvAppVersion;
@@ -45,8 +45,9 @@ public class AppDetails extends Activity {
     Context context;
     CheckBox cbMonitorApp;
     Bundle extras;
-    MonitorDataSource mds;
-    Benchmarker benchmarker;
+    StatsDataSource sds;
+    TextView txt_help_gest_show;
+
 
     protected void onCreate(Bundle savedInstance) {
         // call our parent
@@ -58,20 +59,28 @@ public class AppDetails extends Activity {
         this.context = getApplicationContext();
 
         /** Set up our database connections **/
-        this.mds = new MonitorDataSource(this);
-        this.mds.open();
+        this.sds = new StatsDataSource(this);
+        this.sds.open();
 
         // Grab our app from our intent
         ParcelableApp pa = this.extras.getParcelable("app");
         this.app = pa.getApp();
 
-        // Initialize our monitor, so we know what the status of this app is
-        this.monitor = this.mds.selectMonitorByAppName(this.app.getPackageName());
-        this.active = this.monitor.getActive();
-        this.appName = this.monitor.getAppName();
-
         // Draw our app details activity
         setContentView(R.layout.activity_appdetails);
+
+        txt_help_gest_show = (TextView) findViewById(R.id.txt_help_gest_show);
+        // hide until its title is clicked
+        txt_help_gest_show.setVisibility(View.GONE);
+        /**
+        txt_help_gest.setOnClickListener(new AppDetailsOnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d("AppDebugger", "We are supposed to show our view.....");
+                toggle_contents(v);
+            }
+        });**/
 
         // Set some of our activity's views
         this.tvAppName = (TextView) findViewById(R.id.textViewAppName);
@@ -80,7 +89,6 @@ public class AppDetails extends Activity {
 
         /**https://github.com/jjoe64/GraphView**/
         // init example series data
-        /*
         GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
                 new GraphView.GraphViewData(1, 2.0d)
                 , new GraphView.GraphViewData(2, 1.5d)
@@ -94,9 +102,8 @@ public class AppDetails extends Activity {
         );
         graphView.addSeries(exampleSeries); // data
 
-        LinearLayout layout = (LinearLayout) findViewById(R.id.grapher);
-        layout.addView(graphView);
-*/
+        //LinearLayout layout = (LinearLayout) findViewById(R.id.grapher);
+        //layout.addView(graphView);
 
         /** Deprecated for now **/
         /*
@@ -140,6 +147,14 @@ public class AppDetails extends Activity {
 
     public void onDestroy() {
         super.onDestroy();
-        this.mds.close();
+        this.sds.close();
+    }
+
+    public void toggle_contents(View v){
+        if(txt_help_gest_show.isShown()) {
+            txt_help_gest_show.setVisibility(View.GONE);
+        } else {
+            txt_help_gest_show.setVisibility(View.VISIBLE);
+        }
     }
 }

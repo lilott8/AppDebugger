@@ -31,9 +31,8 @@ public class NetworkMonitor extends Benchmarker{
     public NetworkMonitor(App whichApp, Context c) {
         super();
         this.app = whichApp;
-        this.trafficStats = new TrafficStats();
+        //this.trafficStats = new TrafficStats();
         this.context = c;
-        try {} catch(NullPointerException e) {}
     }
 
     /**
@@ -46,8 +45,12 @@ public class NetworkMonitor extends Benchmarker{
     public long getTxBytes() {
         long bytes = 0;
 
-        if((bytes = this.trafficStats.getUidTxBytes(this.app.getUid())) < 1) {
+        if((bytes = TrafficStats.getUidTxBytes(this.app.getUid())) < 1) {
             bytes = this.getTxBytesManual();
+        }
+        else if(bytes == 0) {
+            bytes = TrafficStats.getTotalTxBytes();
+            Log.d("AppDebugger", "We are grabbing total phone tx bytes");
         }
         return bytes;
     }
@@ -108,8 +111,7 @@ public class NetworkMonitor extends Benchmarker{
      */
     public void measureNetworkState() {
         int i=0;
-        while(!Connectivity.isConnected(this.context) || i < 100) {
-            i++;
+        while(!Connectivity.isConnected(this.context)) {
         }
         Log.d("AppDebugger", "leaving measureNetworkState");
     }
@@ -148,7 +150,7 @@ public class NetworkMonitor extends Benchmarker{
             previousTx = nowTx;
             nowTx = this.getTxBytes();
             //Log.d("AppDebugger", "now: " + Long.toString(nowTx) + " ---- previous: " + Long.toString(previousTx));
-            i++;
+            //i++;
             //} else {
             //    break;
             //}

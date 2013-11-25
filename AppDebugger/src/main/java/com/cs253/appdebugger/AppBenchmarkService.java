@@ -60,6 +60,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // Just a way to group and consolidate various actions
         this.initializeVariables();
         // create the linearlayout
+        /*
         this.touchLayoutLeft = new LinearLayout(this);
         this.touchLayoutRight = new LinearLayout(this);
         // set the parameters for our layout
@@ -96,6 +97,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         //  attach our layout to our window manager
         this.mWindowManagerLeft.addView(this.touchLayoutLeft, mParamsLeft);
         this.mWindowManagerRight.addView(this.touchLayoutRight, mParamsRight);
+        */
     }
 
     /**
@@ -193,7 +195,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // Android Version
         uploader.addEntry("1037276429", Build.VERSION.RELEASE);
         // Upload the data
-        // uploader.upload();
+        uploader.upload();
     }
 
     /**
@@ -210,14 +212,23 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
             Log.e("AppDebugger", "Benchmark Intent is null!");
             return;
         }
-        // get our nic state change time
-        this.nicLoadTime = System.currentTimeMillis();
-        this.benchmarker.nm.measureNetworkState();
-        this.nicLoadTime = System.currentTimeMillis() - this.nicLoadTime;
-        Log.d("AppDebugger", "It took " + Long.toString(this.nicLoadTime) +
-                " milliseconds to turn on a nic");
+        this.measureTheNic();
 
         // get our network load time!
+        // while time is not out and our traffic is 0 then do this
+        int seconds = 5;
+        this.appLoadTime = System.currentTimeMillis();
+        while(this.benchmarker.nm.getTotalBytesSent() < 1 && seconds >= 0) {
+            try {
+                this.benchmarker.nm.measureNetworkUse();
+                Thread.sleep(1000);
+                seconds--;
+            } catch (Exception e) {
+                seconds--;
+            }
+        }
+        this.appLoadTime = Math.abs((System.currentTimeMillis() - this.appLoadTime) - (seconds*1000));
+        /*
         this.appLoadTime = System.currentTimeMillis();
         while(this.benchmarker.nm.getTotalBytesSent() < 1 && !this.touched) {
             this.benchmarker.nm.measureNetworkUse();
@@ -225,7 +236,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // reset our touched value
         this.appLoadTime = System.currentTimeMillis() - this.appLoadTime;
         this.touched = false;
-
+        */
         Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " +
                 Long.toString(this.appLoadTime) + " milliseconds to load");
 
@@ -235,15 +246,18 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         Stats s = this.statsDataSource.createStats(this.appLoadTime, this.app.getPackageName(),
                 this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime, this.benchmarker.nm.getWhichNic());
 
-        if (s.getId() > 0) {
-            Log.d("AppDebugger", "Our insert happened successfully");
-        } else {
-            Log.e("AppDebugger", "Our insert failed :(");
-        }
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         this.postDataToForm();
     }
 
+    public void measureTheNic() {
+        // get our nic state change time
+        this.nicLoadTime = System.currentTimeMillis();
+        this.benchmarker.nm.measureNetworkState();
+        this.nicLoadTime = System.currentTimeMillis() - this.nicLoadTime;
+        Log.d("AppDebugger", "It took " + Long.toString(this.nicLoadTime) +
+                " milliseconds to turn on a nic");
+    }
     // https://github.com/kpbird/android-global-touchevent
     @Override
     public boolean onTouch(View v, MotionEvent event) {

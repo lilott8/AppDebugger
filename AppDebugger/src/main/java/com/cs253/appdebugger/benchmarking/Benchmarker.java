@@ -30,7 +30,6 @@ public class Benchmarker {
         this.context = c;
         this.logger = new Logger("V");
         this.nm = new NetworkMonitor(this.app, this.context);
-        Log.d("AppDebugger", "Here is the context from Benchmarker: " + this.context.toString());
     }
 
     public Context getContext() {

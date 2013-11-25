@@ -72,11 +72,9 @@ public class StatsDataSource {
         values.put(MySQLiteHelper.DATA_SENT, data_sent);
         // Attempt to insert the record
         try {
-            Log.d("AppDebugger", "Attempting to insert into stats");
             // Insert into stats ( app_name, start_time, end_time, data_sent) VALUES
             // (value 1, value 2, value 3, value 4, value 5);
             long insertId = this.database.insert(MySQLiteHelper.TABLE_STATS, null, values);
-            Log.d("AppDebugger", "Insert ID: " + Long.toString(insertId));
             // grab the newest record from our db
             // Select * from stats where _ID = insert_id from above
             Cursor cursor = this.database.query(MySQLiteHelper.TABLE_STATS, this.allColumns,
@@ -89,7 +87,7 @@ public class StatsDataSource {
             cursor.close();
             return stats;
         } catch (SQLException e) {
-            Log.d("AppDebugger", "We couldn't insert: " + e.toString());
+            Log.e("AppDebugger", "We couldn't insert: " + e.toString());
             return null;
         }
     }

@@ -63,18 +63,16 @@ public class AppListAdapter extends BaseAdapter {
     }
 
     public void startBenchmarkService(int i) {
-        Toast.makeText(this.context, "i is: " + Integer.toString(i) + " " + this.mApps.get(i).getTitle(), Toast.LENGTH_SHORT).show();
         ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Initialize an intent to our service that will monitor for stats gathering
         Intent intent = new Intent(this.context.getApplicationContext(), AppBenchmarkService.class);
         // Put our app name in our intent so we have access to it in our service
         intent.putExtra("app", pa);
         // start our service
-        // this.context.startService(intent);
+        this.context.startService(intent);
     }
 
     public void startResultsActivity(int i) {
-        Toast.makeText(this.context, "i is: " + Integer.toString(i) + " " + this.mApps.get(i).getTitle(), Toast.LENGTH_SHORT).show();
         // Create a parcelable app
         ParcelableApp pa = new ParcelableApp(this.mApps.get(i));
         // Create a new intent for our new activity
@@ -84,7 +82,7 @@ public class AppListAdapter extends BaseAdapter {
         // This is needed to start our activity from outside an activity
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // start the activity
-        // this.context.startActivity(intent);
+        this.context.startActivity(intent);
     }
 
     @Override
@@ -106,7 +104,6 @@ public class AppListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         AppViewHolder holder;
-        Log.d("AppDebugger", "Position: " + position);
         this.app = mApps.get(position);
 
         if(convertView == null) {
