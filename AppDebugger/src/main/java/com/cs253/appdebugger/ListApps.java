@@ -1,6 +1,8 @@
 package com.cs253.appdebugger;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.content.Context;
+import android.widget.Toast;
+
+import com.cs253.appdebugger.other.ParcelableApp;
 
 /**
  * This demo program displays all currently installed apps of the device in a list. An app can be started
@@ -92,9 +97,7 @@ public class ListApps extends Activity implements OnItemClickListener {
 
         Intent intent = new Intent(view.getContext(), AppDetails.class);
 
-        // Toast.makeText(getApplicationContext(), app.getPackageName(), Toast.LENGTH_LONG).show();
-
-        intent.putExtra("packageName", app.getPackageName());
+        intent.putExtra("app", new ParcelableApp(app));
         startActivity(intent);
     }
 
@@ -130,6 +133,13 @@ public class ListApps extends Activity implements OnItemClickListener {
             app.setUid(a.uid);
             apps.add(app);
         }
+        // Sort our apps
+        Collections.sort(apps, new Comparator<App>() {
+            public int compare(App a, App b) {
+                return a.getTitle().compareToIgnoreCase(b.getTitle());
+            }
+        });
+
         return apps;
     }
 
@@ -165,13 +175,5 @@ public class ListApps extends Activity implements OnItemClickListener {
         protected void onPostExecute(Void result) {
             mAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 }

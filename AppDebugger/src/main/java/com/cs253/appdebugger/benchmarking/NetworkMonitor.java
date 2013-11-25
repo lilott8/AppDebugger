@@ -33,11 +33,7 @@ public class NetworkMonitor extends Benchmarker{
         this.app = whichApp;
         this.trafficStats = new TrafficStats();
         this.context = c;
-        try {
-            Log.d("AppDebugger", "Context from networkmonitor: "+this.context.toString());
-        } catch(NullPointerException e) {
-            Log.d("AppDebugger", "Context is null?! -- Network Monitor");
-        }
+        try {} catch(NullPointerException e) {}
     }
 
     /**
@@ -112,7 +108,6 @@ public class NetworkMonitor extends Benchmarker{
      */
     public void measureNetworkState() {
         int i=0;
-        Log.d("AppDebugger", "starting measureNetworkState");
         while(!Connectivity.isConnected(this.context) || i < 100) {
             i++;
         }

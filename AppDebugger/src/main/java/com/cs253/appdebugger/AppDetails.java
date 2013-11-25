@@ -19,9 +19,9 @@ import android.content.Context;
 import android.view.View.OnClickListener;
 import com.cs253.appdebugger.database.Monitor;
 import com.cs253.appdebugger.other.ParcelableApp;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
+//import com.jjoe64.graphview.GraphView;
+//import com.jjoe64.graphview.GraphViewSeries;
+//import com.jjoe64.graphview.LineGraphView;
 
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
@@ -118,7 +118,7 @@ public class AppDetails extends Activity {
 
     /**
      * Deprecated for now
-     * @param v
+     *
      * We must implement OnClickListener if we want to use this!
      */
     /*
