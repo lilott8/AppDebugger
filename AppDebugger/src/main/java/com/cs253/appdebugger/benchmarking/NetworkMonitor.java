@@ -1,15 +1,10 @@
 package com.cs253.appdebugger.benchmarking;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.TrafficStats;
 import android.util.Log;
 
 import com.cs253.appdebugger.App;
-import com.cs253.appdebugger.NetworkConnectivityListener;
 import com.cs253.appdebugger.other.Connectivity;
 
 import java.io.BufferedReader;
@@ -149,7 +144,7 @@ public class NetworkMonitor extends Benchmarker{
         long nowTx = this.getTxBytes();
         // just a small fail-safe, I know this technically adds to the loading time,
         // but I want to rule out some silly loop problems.
-        int seconds = 5;
+        int seconds = 7;
         Log.d("AppDebugger", "Initial Bytes:" + initialTx);
         /**
          * Measure the deltas of tx sizes
@@ -163,6 +158,7 @@ public class NetworkMonitor extends Benchmarker{
                 nowTx = this.getTxBytes();
                 previousTx = nowTx;
                 Thread.sleep(1000);
+                Log.d("AppDebugger", "There are: " + seconds + " remaining");
                 seconds--;
             } catch (Exception e) {
                 seconds--;

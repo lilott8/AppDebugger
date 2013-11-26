@@ -193,6 +193,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         uploader.addEntry("1393503322", this.benchmarker.nm.getWhichNic());
         // Android Version
         uploader.addEntry("1037276429", Build.VERSION.RELEASE);
+        // Make and Build of the model
+        uploader.addEntry("1320755101", Build.MANUFACTURER + "-" + Build.PRODUCT);
         // Upload the data
         uploader.upload();
     }

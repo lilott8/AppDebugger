@@ -1,4 +1,4 @@
-package com.cs253.appdebugger;
+package com.cs253.appdebugger.benchmarking;
 
 /*
  * Copyright (C) 2006 The Android Open Source Project
