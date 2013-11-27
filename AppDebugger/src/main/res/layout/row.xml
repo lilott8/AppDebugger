@@ -62,7 +62,7 @@
             android:layout_marginRight="4dp"/>
         <TextView
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:id="@+id/appbenchmark"
             android:textSize="@dimen/fontMedium"
             android:paddingTop="@dimen/rowPaddingMedium"
@@ -91,7 +91,7 @@
             android:layout_marginRight="4dp"/>/>
         <TextView
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:id="@+id/appresults"
             android:textSize="@dimen/fontMedium"
             android:paddingTop="@dimen/rowPaddingMedium"
