@@ -153,7 +153,7 @@ public class NetworkMonitor extends Benchmarker{
          *  get new now
          * }
          */
-        while((Math.abs(nowTx - previousTx) > deltaTx) || seconds > 0) {
+        while((Math.abs(nowTx - previousTx) > deltaTx) && seconds > 0) {
             try {
                 nowTx = this.getTxBytes();
                 previousTx = nowTx;
