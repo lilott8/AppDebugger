@@ -218,8 +218,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // get our network load time!
         // while time is not out and our traffic is 0 then do this
         this.appLoadTime = System.currentTimeMillis();
-        long seconds = this.benchmarker.nm.measureNetworkUse();
-        this.appLoadTime = Math.abs((System.currentTimeMillis() - this.appLoadTime) - seconds);
+        double seconds = this.benchmarker.nm.measureNetworkUse();
+        this.appLoadTime = Math.abs((System.currentTimeMillis() - this.appLoadTime) - (long)seconds);
         /*
         this.appLoadTime = System.currentTimeMillis();
         while(this.benchmarker.nm.getTotalBytesSent() < 1 && !this.touched) {

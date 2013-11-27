@@ -22,6 +22,7 @@ public class NetworkMonitor extends Benchmarker{
     private TrafficStats trafficStats;
     private long totalBytesSent;
     private Context context;
+    String TAG = "AppDebugger";
 
     public NetworkMonitor(App whichApp, Context c) {
         super();
@@ -46,7 +47,7 @@ public class NetworkMonitor extends Benchmarker{
         }
         else if(bytes == 0) {
             bytes = TrafficStats.getTotalTxBytes();
-            Log.d("AppDebugger", "We are grabbing total phone tx bytes");
+            Log.d(this.TAG, "We are grabbing total phone tx bytes");
         }
         return bytes;
         */
@@ -130,7 +131,7 @@ public class NetworkMonitor extends Benchmarker{
      * @return
      *  long of bytes used
      */
-    public long measureNetworkUse() {
+    public double measureNetworkUse() {
         // These four longs will help us determine
         // the loading of an app.  When the size
         // between nowTx and PreviousTx are less
@@ -144,8 +145,8 @@ public class NetworkMonitor extends Benchmarker{
         long nowTx = this.getTxBytes();
         // just a small fail-safe, I know this technically adds to the loading time,
         // but I want to rule out some silly loop problems.
-        int seconds = 7;
-        Log.d("AppDebugger", "Initial Bytes:" + initialTx);
+        double seconds = 10;
+        Log.d(this.TAG, "Initial Bytes:" + initialTx);
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -160,25 +161,30 @@ public class NetworkMonitor extends Benchmarker{
          *
          */
         boolean kickOut = false;
-        while(((Math.abs(nowTx - previousTx) > deltaTx) || kickOut) && seconds > 0) {
+        while(((Math.abs(nowTx - previousTx) > deltaTx) || !kickOut) && seconds > 0) {
             try {
                 nowTx = this.getTxBytes();
                 previousTx = nowTx;
-                Thread.sleep(1000);
-                Log.d("AppDebugger", "There are: " + seconds + " remaining");
-                seconds--;
+                // We must
+                Thread.sleep(250);
+                Log.d(this.TAG, "There are: " + seconds + " remaining");
+                seconds = seconds-.25;
             } catch (Exception e) {
-                seconds--;
+                seconds = seconds-.25;
             }
-            if(nowTx - initialTx > 0) {
+            if(Math.abs(nowTx - initialTx) > 0) {
                 kickOut = true;
+                Log.d(this.TAG, "Our kickout has been set");
             }
-            Log.d("AppDebugger", "==================================================");
-            Log.d("AppDebugger", "Total bytes are: " + nowTx);
-            Log.d("AppDebugger", "==================================================");
-        }
+            Log.d(this.TAG, "==================================================");
+            Log.d(this.TAG, "Total bytes are: " + nowTx);
+            Log.d(this.TAG, "==================================================");
+        }// while statement
         this.totalBytesSent = Math.abs(nowTx - initialTx);
-        return 1000*seconds;
+        Log.d(this.TAG, "***********************************************");
+        Log.d(this.TAG, "Total bytes sent: " + this.totalBytesSent);
+        Log.d(this.TAG, "***********************************************");
+        return (double)1000*seconds;
     }
 
     public long getTotalBytesSent(){
@@ -193,7 +199,7 @@ public class NetworkMonitor extends Benchmarker{
                 return "WIFI";
             }
         } catch(NullPointerException e) {
-            Log.d("AppDebugger", "We couldn't get the nic type");
+            Log.d(this.TAG, "We couldn't get the nic type");
             return "nan";
         }
     }
