@@ -40,17 +40,17 @@ public class NetworkMonitor extends Benchmarker{
      */
     public long getTxBytes() {
         long bytes = 0;
-        return TrafficStats.getTotalTxBytes();
-        /*
+        //return TrafficStats.getTotalTxBytes();
+
         if((bytes = TrafficStats.getUidTxBytes(this.app.getUid())) < 1) {
             bytes = this.getTxBytesManual();
         }
-        else if(bytes == 0) {
+        if(bytes == 0) {
             bytes = TrafficStats.getTotalTxBytes();
             Log.d(this.TAG, "We are grabbing total phone tx bytes");
         }
         return bytes;
-        */
+
     }
 
     public long bytesTransmitted(int i) {
