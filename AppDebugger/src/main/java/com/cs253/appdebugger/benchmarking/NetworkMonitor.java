@@ -153,7 +153,14 @@ public class NetworkMonitor extends Benchmarker{
          *  get new now
          * }
          */
-        while((Math.abs(nowTx - previousTx) > deltaTx) && seconds > 0) {
+        /**
+         * Things to account for:
+         *  apps can take n-seconds before they start tx data
+         *  apps can send data at irregular data over n-seconds
+         *
+         */
+        boolean kickOut = false;
+        while(((Math.abs(nowTx - previousTx) > deltaTx) || kickOut) && seconds > 0) {
             try {
                 nowTx = this.getTxBytes();
                 previousTx = nowTx;
@@ -162,6 +169,9 @@ public class NetworkMonitor extends Benchmarker{
                 seconds--;
             } catch (Exception e) {
                 seconds--;
+            }
+            if(nowTx - initialTx > 0) {
+                kickOut = true;
             }
             Log.d("AppDebugger", "==================================================");
             Log.d("AppDebugger", "Total bytes are: " + nowTx);
