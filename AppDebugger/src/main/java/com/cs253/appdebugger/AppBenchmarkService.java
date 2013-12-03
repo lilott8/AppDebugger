@@ -1,5 +1,6 @@
 package com.cs253.appdebugger;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
@@ -25,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+
+import java.util.List;
 
 /**
  * Created by jason on 10/24/13.
@@ -111,6 +114,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
     public int onStartCommand(Intent intent, int flags, int startID) {
         // get our intent extras that we send to this class
         this.extras = intent.getExtras();
+        try{
         ParcelableApp pa = this.extras.getParcelable("app");
         this.app = pa.getApp();
         // This is our benchmarker.  It allows us to do various benchmarking
@@ -126,6 +130,9 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         });
         // Start our thread
         t.start();
+        } catch (NullPointerException e) {
+            Log.d("AppDebugger", "Our parcelable app is null");
+        }
         return START_STICKY;
     }
 
@@ -213,6 +220,10 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
             Log.e("AppDebugger", "Benchmark Intent is null!");
             return;
         }
+        // This has to be here because our PID isn't set until
+        // the intent is completed
+        this.getPid();
+        this.getAddressesAndPorts();
         this.measureTheNic();
 
         // get our network load time!
@@ -224,15 +235,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         } else {
             this.appLoadTime = Math.abs((System.currentTimeMillis() - this.appLoadTime) - (long)seconds);
         }
-        /*
-        this.appLoadTime = System.currentTimeMillis();
-        while(this.benchmarker.nm.getTotalBytesSent() < 1 && !this.touched) {
-            this.benchmarker.nm.measureNetworkUse();
-        }
-        // reset our touched value
-        this.appLoadTime = System.currentTimeMillis() - this.appLoadTime;
-        this.touched = false;
-        */
+
         Log.d("AppDebugger", "It took " + this.app.getPackageName() + " " +
                 Long.toString(this.appLoadTime) + " milliseconds to load");
 
@@ -244,6 +247,19 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
 
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
         this.postDataToForm();
+    }
+
+    public void getPid() {
+        ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> services = manager.getRunningAppProcesses();
+
+        int i = 0;
+
+        while(i<services.size() && services.get(i).uid != this.app.getUid()) {
+            i++;
+        }
+        this.app.setPid(services.get(i).pid);
+        Log.d("AppDebugger", "The pid for " + this.app.getTitle() + "is " + this.app.getPid());
     }
 
     public void measureTheNic() {
@@ -262,6 +278,10 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
             Log.i("AppDebugger", "Action :" + event.getAction() + "\t X :" + event.getRawX() + "\t Y :"+ event.getRawY());
         }
         return true;
+    }
+
+    public void getAddressesAndPorts() {
+
     }
 
 }

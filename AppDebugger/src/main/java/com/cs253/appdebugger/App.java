@@ -34,6 +34,7 @@ public class App {
     private String description;
     private String label;
     private int uid;
+    private int pid;
 
     // ordinary getters and setters
 
@@ -79,11 +80,15 @@ public class App {
 
     public void setLabel(String label) { this.label = label;}
 
+    public void setPid(int p) {this.pid = p;}
+
     public String getLabel() { return this.label;}
 
     public void setUid(int uid) {this.uid = uid;}
 
     public int getUid() {return this.uid;}
+
+    public int getPid() { return this.pid;}
 
 }
 
