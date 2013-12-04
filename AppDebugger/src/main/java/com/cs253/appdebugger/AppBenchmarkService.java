@@ -15,6 +15,7 @@ import com.cs253.appdebugger.benchmarking.Benchmarker;
 import com.cs253.appdebugger.database.Stats;
 import com.cs253.appdebugger.database.StatsDataSource;
 import com.cs253.appdebugger.other.AeSimpleSHA1;
+import com.cs253.appdebugger.other.Commander;
 import com.cs253.appdebugger.other.ParcelableApp;
 
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -112,28 +114,31 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
-        // get our intent extras that we send to this class
-        this.extras = intent.getExtras();
         try{
-        ParcelableApp pa = this.extras.getParcelable("app");
-        this.app = pa.getApp();
-        // This is our benchmarker.  It allows us to do various benchmarking
-        // functions, read logs, monitor network traffic, etc
-        this.benchmarker = new Benchmarker(this.app, this);
-        // We want to thread this so we don't get in trouble from android
-        // and so we don't affect the results!
-        Thread t = new Thread(new Runnable() {
+            // get our intent extras that we send to this class
+            this.extras = intent.getExtras();
+            ParcelableApp pa = this.extras.getParcelable("app");
+            this.app = pa.getApp();
+            // This is our benchmarker.  It allows us to do various benchmarking
+            // functions, read logs, monitor network traffic, etc
+            this.benchmarker = new Benchmarker(this.app, this);
+            // We want to thread this so we don't get in trouble from android
+            // and so we don't affect the results!
+            Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 runMeasurement();
            }
         });
-        // Start our thread
-        t.start();
-        } catch (NullPointerException e) {
-            Log.d("AppDebugger", "Our parcelable app is null");
+            // Start our thread
+            t.start();
+        } catch (Exception e) {
+            Log.e("AppDebugger", "Our parcelable app is null");
         }
-        return START_STICKY;
+        // This will only allow for the service to be restarted explicitly
+        return START_NOT_STICKY;
+        // This will restart the service with the previous intent
+        // return START_REDELIVER_INTENT;
     }
 
     /**
@@ -149,8 +154,12 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // Our databases are now loaded
         // get our application context
         this.parentApp = getApplication();
-        this.context = this.parentApp.getApplicationContext();
-        this.touched = false;
+        try {
+            this.context = this.parentApp.getApplicationContext();
+        } catch (NullPointerException e) {
+            Log.e("AppDebugger", "Our application context is null");
+        }
+        // this.touched = false;
     }
 
     @Override
@@ -223,7 +232,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         // This has to be here because our PID isn't set until
         // the intent is completed
         this.getPid();
-        this.getAddressesAndPorts();
+        //this.getAddressesAndPorts();
         this.measureTheNic();
 
         // get our network load time!
@@ -246,20 +255,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
                 this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime, this.benchmarker.nm.getWhichNic());
 
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
-        this.postDataToForm();
-    }
-
-    public void getPid() {
-        ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> services = manager.getRunningAppProcesses();
-
-        int i = 0;
-
-        while(i<services.size() && services.get(i).uid != this.app.getUid()) {
-            i++;
-        }
-        this.app.setPid(services.get(i).pid);
-        Log.d("AppDebugger", "The pid for " + this.app.getTitle() + "is " + this.app.getPid());
+        //this.postDataToForm();
     }
 
     public void measureTheNic() {
@@ -267,8 +263,8 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
         this.nicLoadTime = System.currentTimeMillis();
         this.benchmarker.nm.measureNetworkState();
         this.nicLoadTime = System.currentTimeMillis() - this.nicLoadTime;
-        Log.d("AppDebugger", "It took " + Long.toString(this.nicLoadTime) +
-                " milliseconds to turn on a nic");
+        //Log.d("AppDebugger", "It took " + Long.toString(this.nicLoadTime) +
+        //        " milliseconds to turn on a nic");
     }
     // https://github.com/kpbird/android-global-touchevent
     @Override
@@ -281,7 +277,32 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
     }
 
     public void getAddressesAndPorts() {
-
+        Commander c = new Commander();
+        //String result = c.executeCommand(new String[]{"top"});
+        String result = c.executeCommand(this.app.getPid());
+        //Log.d("AppDebugger", "result: " + result);
     }
 
+    public void getPid() {
+        ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> services = manager.getRunningAppProcesses();
+
+        try {
+            int i = 0;
+            Log.d("AppDebugger", "Size of services: " + services.size());
+            while(services.get(i).uid != this.app.getUid() && i<services.size()-1) {
+                i++;
+            }//while
+            Log.d("AppDebugger", "i: " + i);
+            try {
+                this.app.setPid(services.get(i).pid);
+                Log.d("AppDebugger", "Pid: " + this.app.getPid());
+            } catch(IndexOutOfBoundsException e) {
+                Log.d("AppDebugger", "Our index is out of bounds!");
+            }//indexoutofbounds catch
+        } catch (NullPointerException e) {
+            Log.d("AppDebugger", "NullPointer for our service size???");
+        }//nullpointerexception catch
+        Log.d("AppDebugger", "The pid for " + this.app.getTitle() + " is " + this.app.getPid());
+    }
 }

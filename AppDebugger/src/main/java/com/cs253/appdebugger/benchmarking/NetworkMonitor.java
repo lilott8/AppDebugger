@@ -47,7 +47,7 @@ public class NetworkMonitor extends Benchmarker{
         }
         if(bytes == 0) {
             bytes = TrafficStats.getTotalTxBytes();
-            Log.d(this.TAG, "We are grabbing total phone tx bytes");
+            //Log.d(this.TAG, "We are grabbing total phone tx bytes");
         }
         return bytes;
 
@@ -146,7 +146,7 @@ public class NetworkMonitor extends Benchmarker{
         // just a small fail-safe, I know this technically adds to the loading time,
         // but I want to rule out some silly loop problems.
         double seconds = 10;
-        Log.d(this.TAG, "Initial Bytes:" + initialTx);
+        //Log.d(this.TAG, "Initial Bytes:" + initialTx);
         /**
          * Measure the deltas of tx sizes
          * while (previous-now) > delta) {
@@ -167,7 +167,7 @@ public class NetworkMonitor extends Benchmarker{
                 previousTx = nowTx;
                 // We must
                 Thread.sleep(250);
-                Log.d(this.TAG, "There are: " + seconds + " remaining");
+                //Log.d(this.TAG, "There are: " + seconds + " remaining");
                 seconds = seconds-.25;
             } catch (Exception e) {
                 seconds = seconds-.25;
@@ -176,14 +176,14 @@ public class NetworkMonitor extends Benchmarker{
                 kickOut = true;
                 Log.d(this.TAG, "Our kickout has been set");
             }
-            Log.d(this.TAG, "==================================================");
-            Log.d(this.TAG, "Total bytes are: " + nowTx);
-            Log.d(this.TAG, "==================================================");
+            //Log.d(this.TAG, "==================================================");
+            //Log.d(this.TAG, "Total bytes are: " + nowTx);
+            //Log.d(this.TAG, "==================================================");
         }// while statement
         this.totalBytesSent = Math.abs(nowTx - initialTx);
-        Log.d(this.TAG, "***********************************************");
-        Log.d(this.TAG, "Total bytes sent: " + this.totalBytesSent);
-        Log.d(this.TAG, "***********************************************");
+        //Log.d(this.TAG, "***********************************************");
+        //Log.d(this.TAG, "Total bytes sent: " + this.totalBytesSent);
+        //Log.d(this.TAG, "***********************************************");
         return (double)1000*seconds;
     }
 
