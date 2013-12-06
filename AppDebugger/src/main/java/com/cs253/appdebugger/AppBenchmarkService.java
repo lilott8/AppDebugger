@@ -255,7 +255,7 @@ public class AppBenchmarkService extends Service implements View.OnTouchListener
                 this.benchmarker.nm.getTotalBytesSent(), this.nicLoadTime, this.benchmarker.nm.getWhichNic());
 
         //Toast.makeText(this.context, this.app.getLabel() + " is done loading", Toast.LENGTH_SHORT).show();
-        //this.postDataToForm();
+        this.postDataToForm();
     }
 
     public void measureTheNic() {
